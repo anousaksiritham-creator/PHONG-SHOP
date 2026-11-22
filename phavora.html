@@ -1,4 +1,4 @@
-<title>PHONG-SHOP</title>
+<title>PHAVORA</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#0b0b0c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -246,6 +246,10 @@ form{display:grid;gap:16px}
 .qrbox{background:#fff;border-radius:6px;padding:16px;display:grid;justify-items:center;gap:8px;color:#444;max-width:280px;width:100%;margin-inline:auto}
 .qrbox svg,.qrbox img{width:100%;max-width:220px;height:auto;display:block}
 .qrbox small{font-size:11.5px;text-align:center;line-height:1.4}
+.qrbox.card{padding:0;overflow:hidden;max-width:340px}
+.qrbox.card img{max-width:none;-webkit-touch-callout:default}
+.qrsave{display:grid;gap:6px;justify-items:center;max-width:340px;width:100%;margin-inline:auto}
+.qrsave .note{text-align:center;margin:0;font-size:12px;line-height:1.5}
 dl.kv{margin:0;border:1px solid var(--line);border-radius:4px}
 dl.kv>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line)}
 dl.kv>div:last-child{border-bottom:0}
@@ -402,7 +406,7 @@ ol.steps b{color:var(--paper)}
 (() => {
 'use strict';
 const IMG = 'img/';
-const KEY = 'phongshop-proto-v1';
+const KEY = 'phavora-proto-v2';
 const HOLD_MS = 15 * 60e3, REMIND_MS = 30 * 60e3;
 const CAT = { tops: 'TOPS', bottoms: 'BOTTOMS', acc: 'ACC' };
 const CHARTS = {
@@ -436,7 +440,7 @@ function slipPlaceholder(code, amount, at) {
     g.strokeStyle = '#fff'; g.lineWidth = 6; g.beginPath(); g.moveTo(165, 136); g.lineTo(176, 148); g.lineTo(197, 124); g.stroke();
     g.fillStyle = '#222'; g.font = 'bold 30px sans-serif'; g.textAlign = 'center';
     g.fillText(amount.toLocaleString('en-US') + ' LAK', 180, 222);
-    const rows = [['ໄປຫາ', 'PHONG-SHOP SHOP'], ['ໝາຍເຫດ', code], ['ເວລາ', new Date(at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })]];
+    const rows = [['ໄປຫາ', 'PHAVORA SHOP'], ['ໝາຍເຫດ', code], ['ເວລາ', new Date(at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })]];
     g.font = '16px sans-serif';
     rows.forEach((r, i) => { g.textAlign = 'left'; g.fillStyle = '#888'; g.fillText(r[0], 24, 292 + i * 44); g.textAlign = 'right'; g.fillStyle = '#222'; g.fillText(r[1], 336, 292 + i * 44); });
     g.textAlign = 'center'; g.fillStyle = '#aaa'; g.font = '12px sans-serif'; g.fillText('ຮູບຕົວຢ່າງສຳລັບຕົ້ນແບບ', 180, 528);
@@ -474,20 +478,20 @@ function seed() {
   return {
     v: 1, current: '01', nextCode: 125, cart: [], customer: null,
     drops: [{ id: '00', name: 'DROP 00', month: 'OCT 2026' }, { id: '01', name: 'DROP 01', month: 'NOV 2026' }],
-    bank: { bank: 'BCEL', name: 'PHONG-SHOP SHOP (ຕົວຢ່າງ)', number: '010-12-00-01234567-001', qr: null },
+    bank: { bank: 'BCEL', name: 'PHAVORA SHOP (ຕົວຢ່າງ)', number: '010-12-00-01234567-001', qr: null },
     products,
     orders: [
-      { code: 'PS-0124', createdAt: o4, slipAt: o4 + 3 * M, status: 'pending_review', drop: '01', source: 'tiktok', demo: true,
+      { code: 'PV-0124', createdAt: o4, slipAt: o4 + 3 * M, status: 'pending_review', drop: '01', source: 'tiktok', demo: true,
         items: [{ pid: 'pg-pants', color: 'black', size: 'L', qty: 1, price: 229000 }],
         customer: { name: 'ແກ້ວ', phone: '020 2345 6789', courier: 'Anousith', province: 'ຈຳປາສັກ', branch: 'ເມືອງປາກເຊ · ສາຂາຕະຫຼາດດາວເຮືອງ', note: '' },
-        slip: slipPlaceholder('PS-0124', 229000, o4 + 3 * M) },
-      { code: 'PS-0123', createdAt: now - 3 * H, slipAt: now - 3 * H + 5 * M, confirmedAt: now - 2 * H, status: 'preparing', drop: '01', source: 'tiktok', demo: true,
+        slip: slipPlaceholder('PV-0124', 229000, o4 + 3 * M) },
+      { code: 'PV-0123', createdAt: now - 3 * H, slipAt: now - 3 * H + 5 * M, confirmedAt: now - 2 * H, status: 'preparing', drop: '01', source: 'tiktok', demo: true,
         items: [{ pid: 'nb80', color: 'bw', size: 'M', qty: 1, price: 189000 }, { pid: 'keychain', color: 'mix', size: 'FREE', qty: 1, price: 89000 }],
         customer: { name: 'ຕຸ້ຍ', phone: '020 9898 1123', courier: 'Mixay', province: 'ນະຄອນຫຼວງວຽງຈັນ', branch: 'ເມືອງໄຊເສດຖາ · ສາຂາໂພນຕ້ອງ', note: 'ຂໍຫໍ່ກັນນ້ຳ' }, slip: null },
-      { code: 'PS-0122', createdAt: now - 26 * H, confirmedAt: now - 25 * H, shippedAt: now - 22 * H, status: 'shipped', tracking: 'HAL-220931', drop: '01', source: 'facebook', demo: true,
+      { code: 'PV-0122', createdAt: now - 26 * H, confirmedAt: now - 25 * H, shippedAt: now - 22 * H, status: 'shipped', tracking: 'HAL-220931', drop: '01', source: 'facebook', demo: true,
         items: [{ pid: 'cross-pants', color: 'black', size: 'L', qty: 1, price: 229000 }],
         customer: { name: 'ນ້ອຍ', phone: '020 7777 3402', courier: 'HAL', province: 'ສະຫວັນນະເຂດ', branch: 'ເມືອງໄກສອນ · ສາຂາໃຈກາງ', note: '' }, slip: null },
-      { code: 'PS-0121', createdAt: now - 50 * H, confirmedAt: now - 49 * H, shippedAt: now - 46 * H, status: 'done', tracking: 'ANS-58102', drop: '01', source: 'tiktok', demo: true,
+      { code: 'PV-0121', createdAt: now - 50 * H, confirmedAt: now - 49 * H, shippedAt: now - 46 * H, status: 'done', tracking: 'ANS-58102', drop: '01', source: 'tiktok', demo: true,
         items: [{ pid: 'r99', color: 'cream', size: 'L', qty: 1, price: 189000 }, { pid: 'belt', color: 'black', size: 'FREE', qty: 1, price: 89000 }],
         customer: { name: 'ສົມພອນ', phone: '020 5555 1201', courier: 'Anousith', province: 'ຫຼວງພະບາງ', branch: 'ເມືອງຫຼວງພະບາງ · ສາຂາບ້ານໂພນໄຊ', note: '' }, slip: null }
     ]
@@ -548,11 +552,11 @@ function demoBar(mode) {
 }
 function header() {
   const n = cartCount();
-  return `<header class="top"><div class="wrap"><a class="brand" href="#shop" aria-label="PHONG-SHOP ໜ້າທຳອິດ">PHONG-SHOP</a><nav><a class="navlink" href="#track" aria-label="ອໍເດີຂອງຂ້ອຍ">ອໍເດີ</a><a class="cartbtn" href="#cart">ກະຕ່າ <span class="count${n ? '' : ' zero'}">${n}</span></a></nav></div></header>`;
+  return `<header class="top"><div class="wrap"><a class="brand" href="#shop" aria-label="PHAVORA ໜ້າທຳອິດ">PHAVORA</a><nav><a class="navlink" href="#track" aria-label="ອໍເດີຂອງຂ້ອຍ">ອໍເດີ</a><a class="cartbtn" href="#cart">ກະຕ່າ <span class="count${n ? '' : ' zero'}">${n}</span></a></nav></div></header>`;
 }
 function footer() {
   return `<footer class="foot"><div class="wrap">
-    <div class="big">PHONG-SHOP</div>
+    <div class="big">PHAVORA</div>
     <nav aria-label="ລິ້ງຮ້ານ"><a href="#track">ຕິດຕາມອໍເດີ</a><a href="#policy">ການສົ່ງ ແລະ ການປ່ຽນສິນຄ້າ</a><a href="#archive">ARCHIVE</a></nav>
     <nav aria-label="ໂຊຊຽວ"><button type="button" data-act="social">TikTok</button><button type="button" data-act="social">Facebook</button><button type="button" data-act="social">WhatsApp</button></nav>
     <span>ສົ່ງທົ່ວລາວຜ່ານ Anousith · HAL · Mixay — ຄ່າສົ່ງຈ່າຍປາຍທາງ</span>
@@ -571,7 +575,7 @@ function notFound(msg) {
 
 /* ---------- shop ---------- */
 const STAR = `<svg class="star" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="chr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".42" stop-color="#9ea2a9"/><stop offset=".58" stop-color="#eef0f3"/><stop offset="1" stop-color="#5f636a"/></linearGradient></defs><path d="M50 0C53 35 65 47 100 50C65 53 53 65 50 100C47 65 35 53 0 50C35 47 47 35 50 0Z" fill="url(#chr)"/></svg>`;
-const RING = `<svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="ringp" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/><linearGradient id="chr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#9ea2a9"/><stop offset="1" stop-color="#e9ebee"/></linearGradient></defs><circle cx="60" cy="60" r="58" fill="rgba(11,11,12,.74)" stroke="#45454c"/><text><textPath href="#ringp" textLength="280" lengthAdjust="spacing">LIMITED DROP ✦ ໝົດແລ້ວໝົດເລີຍ ✦ PHONG-SHOP ✦</textPath></text><path d="M60 40C61.6 54 66 58.4 80 60C66 61.6 61.6 66 60 80C58.4 66 54 61.6 40 60C54 58.4 58.4 54 60 40Z" fill="url(#chr2)"/></svg>`;
+const RING = `<svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="ringp" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/><linearGradient id="chr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#9ea2a9"/><stop offset="1" stop-color="#e9ebee"/></linearGradient></defs><circle cx="60" cy="60" r="58" fill="rgba(11,11,12,.74)" stroke="#45454c"/><text><textPath href="#ringp" textLength="280" lengthAdjust="spacing">LIMITED DROP ✦ ໝົດແລ້ວໝົດເລີຍ ✦ PHAVORA ✦</textPath></text><path d="M60 40C61.6 54 66 58.4 80 60C66 61.6 61.6 66 60 80C58.4 66 54 61.6 40 60C54 58.4 58.4 54 60 40Z" fill="url(#chr2)"/></svg>`;
 function ticker(words, cls) {
   const half = [...words, ...words, ...words].map(w => `<span>${esc(w)}</span>`).join('');
   return `<div class="ticker${cls ? ' ' + cls : ''}" aria-hidden="true"><div class="tk">${half}${half}</div></div>`;
@@ -602,10 +606,10 @@ function vShop() {
       <div><button type="button" class="btn chrome shine" data-act="toGrid">SHOP NOW</button></div>
     </div>
   </section>
-  ${ticker(['PHONG-SHOP', 'DROP ' + d.id, 'LIMITED', 'ໝົດແລ້ວໝົດເລີຍ', 'STREET · GOTHIC · Y2K', 'ສົ່ງທົ່ວລາວ'])}
+  ${ticker(['PHAVORA', 'DROP ' + d.id, 'LIMITED', 'ໝົດແລ້ວໝົດເລີຍ', 'STREET · GOTHIC · Y2K', 'ສົ່ງທົ່ວລາວ'])}
   <div class="chips" id="grid"><div class="wrap" role="toolbar" aria-label="ໝວດສິນຄ້າ">${chip('all', 'ALL', list.length)}${cats.map(k => chip(k, CAT[k], list.filter(p => p.cat === k).length)).join('')}</div></div>
   <div class="wrap">${shown.length ? `<div class="grid">${shown.map(card).join('')}</div>` : '<div class="empty"><p>ລ໋ອດນີ້ຍັງບໍ່ມີສິນຄ້າ</p></div>'}</div>
-  ${ticker(['NEW DROP', 'LIMITED PIECES', 'SOLD OUT = GONE', 'PHONG-SHOP'], 'alt')}
+  ${ticker(['NEW DROP', 'LIMITED PIECES', 'SOLD OUT = GONE', 'PHAVORA'], 'alt')}
   <section class="how"><div class="wrap">
     <h2 class="sec-h">ສັ່ງແນວໃດ</h2>
     <ol>
@@ -763,7 +767,7 @@ function submitCheckout() {
   const items = S.cart.map(l => ({ pid: l.pid, color: l.color, size: l.size, qty: l.qty, price: P(l.pid).price }));
   const bad = reserve(items);
   if (bad) { save(); toast(itemName(bad) + ' ຫາກໍໝົດ ກະລຸນາກວດກະຕ່າ'); location.hash = '#cart'; return; }
-  const code = 'PS-' + String(S.nextCode++).padStart(4, '0');
+  const code = 'PV-' + String(S.nextCode++).padStart(4, '0');
   const customer = { name: ck.name, phone: ck.phone, courier: ck.courier === 'ອື່ນໆ' ? ck.courierOther : ck.courier, province: ck.province, branch: ck.branch, note: ck.note };
   S.orders.unshift({ code, createdAt: Date.now(), expiresAt: Date.now() + HOLD_MS, status: 'awaiting_payment', items, customer, slip: null, source: 'direct', drop: S.current, mine: true });
   S.customer = { name: ck.name, phone: ck.phone, courier: ck.courier, courierOther: ck.courierOther, province: ck.province, branch: ck.branch };
@@ -773,13 +777,94 @@ function submitCheckout() {
 
 /* ---------- pay ---------- */
 let slipData = null, slipFor = null;
-function pseudoQR(seedStr) {
+function pseudoQRCells(seedStr) {
   const n = 25; let h = 2166136261;
   for (const ch of seedStr) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
   const rnd = () => { h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return h / 4294967296; };
   const inF = (x, y) => (x < 8 && y < 8) || (x >= n - 8 && y < 8) || (x < 8 && y >= n - 8);
-  let r = '';
-  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { if (!inF(x, y) && rnd() < 0.5) r += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }
+  const cells = [];
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { if (!inF(x, y) && rnd() < 0.5) cells.push([x, y]); }
+  return { n, cells };
+}
+function drawPseudoQR(g, seedStr, x0, y0, size) {
+  const { n, cells } = pseudoQRCells(seedStr), m = Math.floor(size / (n + 4));
+  const R = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(x0 + (x + 2) * m, y0 + (y + 2) * m, w * m, h * m); };
+  g.fillStyle = '#fff'; g.fillRect(x0, y0, size, size);
+  cells.forEach(([x, y]) => R(x, y, 1, 1, '#111'));
+  [[0, 0], [n - 7, 0], [0, n - 7]].forEach(([x, y]) => { R(x, y, 7, 7, '#111'); R(x + 1, y + 1, 5, 5, '#fff'); R(x + 2, y + 2, 3, 3, '#111'); });
+}
+/* Payment card: QR + amount + transfer note in one PNG. A customer with only one phone saves it,
+   then scans it from the photo gallery inside the bank app. */
+let qrCard = null;
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function qrKey(o) { const b = S.bank; return [o.code, orderTotal(o), b.bank, b.name, b.number, b.qr ? b.qr.length + b.qr.slice(-40) : 'demo'].join('|'); }
+function loadImg(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+async function buildQrCard(o) {
+  const key = qrKey(o);
+  if (qrCard && (qrCard.key === key || qrCard.pending === key)) return qrCard.key === key ? qrCard : null;
+  qrCard = { pending: key };
+  const b = S.bank, total = orderTotal(o);
+  const LAO = '"Noto Sans Lao","Leelawadee UI","Phetsarath OT",sans-serif', DISP = 'Anton,Impact,"Arial Narrow Bold",sans-serif';
+  try { await Promise.all(['400 60px Anton', '700 30px "Noto Sans Lao"', '400 30px "Noto Sans Lao"'].map(f => document.fonts.load(f))); } catch (e) {}
+  let img = null; if (b.qr) { try { img = await loadImg(b.qr); } catch (e) {} }
+  const W = 1080, P = 72, BOX = 754, qy = 190;
+  let qw = BOX, qh = BOX;
+  if (img) { const s = Math.min(BOX / img.naturalWidth, 1000 / img.naturalHeight); qw = Math.round(img.naturalWidth * s); qh = Math.round(img.naturalHeight * s); }
+  const y = qy + qh + (img ? 0 : 50), sy = y + 310, H = sy + 180;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  g.textBaseline = 'alphabetic';
+  g.textAlign = 'left'; g.fillStyle = '#0b0b0c'; g.font = `400 76px ${DISP}`; g.fillText('PHAVORA', P, 130);
+  g.textAlign = 'right'; g.fillStyle = '#6b6b70'; g.font = `700 28px ${LAO}`; g.fillText('ສະແກນເພື່ອໂອນ', W - P, 96);
+  g.font = '700 22px Inter,sans-serif'; g.fillText('SCAN TO PAY', W - P, 130);
+  const qx = Math.round((W - qw) / 2);
+  if (img) g.drawImage(img, qx, qy, qw, qh); else drawPseudoQR(g, o.code, qx, qy, BOX);
+  g.textAlign = 'center';
+  if (!img) { g.fillStyle = '#9a9aa0'; g.font = `400 26px ${LAO}`; g.fillText('QR ຕົວຢ່າງ · ຍັງບໍ່ແມ່ນ QR ແທ້ຂອງຮ້ານ', W / 2, y - 6); }
+  g.fillStyle = '#6b6b70'; g.font = `700 28px ${LAO}`; g.fillText('ຍອດໂອນ', W / 2, y + 66);
+  g.fillStyle = '#0b0b0c'; g.font = `400 100px ${DISP}`; g.fillText(kip(total), W / 2, y + 172, W - 2 * P);
+  g.fillStyle = '#3a3a40'; g.font = `400 28px ${LAO}`; g.fillText(`${b.bank} · ${b.name}`, W / 2, y + 228, W - 2 * P);
+  g.font = '600 30px ui-monospace,Consolas,monospace'; g.fillText(b.number, W / 2, y + 270, W - 2 * P);
+  g.fillStyle = '#0b0b0c'; g.fillRect(0, sy, W, H - sy);
+  g.fillStyle = '#a9a9b0'; g.font = `700 26px ${LAO}`; g.fillText('ພິມລະຫັດນີ້ໃນຊ່ອງໝາຍເຫດການໂອນ', W / 2, sy + 56);
+  g.fillStyle = '#fff'; g.font = `400 84px ${DISP}`; g.fillText(o.code, W / 2, sy + 148);
+  const url = c.toDataURL('image/png');
+  const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+  const name = `PHAVORA-${o.code}-QR.png`;
+  let file = null; try { file = blob && new File([blob], name, { type: 'image/png' }); } catch (e) {}
+  if (!qrCard || qrCard.pending !== key) return null;
+  qrCard = { key, url, blob, file, name };
+  return qrCard;
+}
+function paintQrCard() {
+  const [v, a] = parse(); if (v !== 'pay') return;
+  const o = S.orders.find(x => x.code === a), box = $('#qrbox');
+  if (!o || !box || box.classList.contains('card')) return;
+  buildQrCard(o).then(cd => {
+    const bx = $('#qrbox'); if (!cd || !bx || parse()[1] !== o.code || cd.key !== qrKey(o)) return;
+    bx.classList.add('card'); bx.innerHTML = `<img src="${cd.url}" alt="QR ໂອນເງິນ ${o.code} · ${kip(orderTotal(o))}">`;
+  }).catch(() => { qrCard = null; });
+}
+async function saveQr() {
+  const [, a] = parse(); const o = S.orders.find(x => x.code === a); if (!o) return;
+  const cd = qrCard && qrCard.key === qrKey(o) ? qrCard : null;
+  if (!cd) { toast('ກຳລັງກຽມຮູບ QR · ລອງກົດອີກຄັ້ງ'); paintQrCard(); return; }
+  const done = 'ເປີດແອບທະນາຄານ → ສະແກນ → ເລືອກຮູບ QR ຈາກຄັງຮູບ';
+  // iPhone: the share sheet's "Save Image" puts it in Photos, where bank apps look. A plain download would land in Files.
+  if (IOS && cd.file && navigator.canShare && navigator.canShare({ files: [cd.file] })) {
+    try { await navigator.share({ files: [cd.file] }); toast(done); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }
+  }
+  const href = cd.blob ? URL.createObjectURL(cd.blob) : cd.url;
+  const link = document.createElement('a'); link.href = href; link.download = cd.name;
+  document.body.appendChild(link); link.click(); link.remove();
+  if (cd.blob) setTimeout(() => URL.revokeObjectURL(href), 10000);
+  toast('ບັນທຶກ QR ແລ້ວ · ' + done);
+}
+function pseudoQR(seedStr) {
+  const { n, cells } = pseudoQRCells(seedStr);
+  const r = cells.map(([x, y]) => `<rect x="${x}" y="${y}" width="1" height="1"/>`).join('');
   const fd = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3"/>`;
   return `<svg viewBox="-2 -2 ${n + 4} ${n + 4}" role="img" aria-label="QR ຕົວຢ່າງ" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><g fill="#111">${r}${fd(0, 0)}${fd(n - 7, 0)}${fd(0, n - 7)}</g></svg>`;
 }
@@ -787,13 +872,20 @@ function vPay(code) {
   const o = S.orders.find(x => x.code === code); if (!o) return notFound('ບໍ່ພົບອໍເດີນີ້');
   if (slipFor !== code) { slipData = null; slipFor = code; }
   const total = orderTotal(o), b = S.bank;
-  const qr = b.qr ? `<img src="${b.qr}" alt="QR ບັນຊີ ${esc(b.bank)} ຂອງຮ້ານ">` : pseudoQR(code) + '<small>QR ຕົວຢ່າງ · ເຈົ້າຂອງຮ້ານອັບ QR ແທ້ໄດ້ໃນ Admin → ຕັ້ງຄ່າ</small>';
+  const card = qrCard && qrCard.key === qrKey(o) ? qrCard : null;
+  const qr = card ? `<img src="${card.url}" alt="QR ໂອນເງິນ ${code} · ${kip(total)}">`
+    : b.qr ? `<img src="${b.qr}" alt="QR ບັນຊີ ${esc(b.bank)} ຂອງຮ້ານ">` : pseudoQR(code);
   return demoBar('shop') + header() + `<div class="wrap"><div class="page">
     <p class="eyebrow">ອໍເດີ <span class="code">${code}</span></p>
     <h1 class="page-h">ໂອນເງິນ</h1>
     <div class="timer" id="timer"><span>ສິນຄ້າຈອງໄວ້ໃຫ້ອີກ</span><b id="cd">15:00</b></div>
     <div><p class="amount">${kip(total)}</p><p class="note">ໂອນຍອດນີ້ໃຫ້ຄົບ. ຄ່າສົ່ງຈ່າຍປາຍທາງ.</p></div>
-    <div class="qrbox">${qr}</div>
+    <div class="qrbox${card ? ' card' : ''}" id="qrbox">${qr}</div>
+    <div class="qrsave">
+      <button type="button" class="btn block" data-act="saveqr"><span aria-hidden="true">↓</span> ບັນທຶກ QR ລົງເຄື່ອງ</button>
+      <p class="note">ຖ້າກົດບັນທຶກບໍ່ໄດ້ (ເຊັ່ນ ເປີດຈາກ TikTok ຫຼື Facebook) ໃຫ້ກົດຄ້າງທີ່ຮູບ QR ຫຼື ຖ່າຍໜ້າຈໍແທນ</p>
+      ${b.qr ? '' : '<p class="note">QR ຕົວຢ່າງ · ເຈົ້າຂອງຮ້ານອັບ QR ແທ້ໄດ້ໃນ Admin → ຕັ້ງຄ່າ</p>'}
+    </div>
     <dl class="kv">
       <div><dt>ທະນາຄານ</dt><dd>${esc(b.bank)}</dd></div>
       <div><dt>ຊື່ບັນຊີ</dt><dd>${esc(b.name)}</dd></div>
@@ -801,9 +893,9 @@ function vPay(code) {
       <div><dt>ໝາຍເຫດການໂອນ</dt><dd><span class="code">${code}</span><button type="button" class="copy" data-act="copy" data-v="${code}">ກັອບ</button></dd></div>
     </dl>
     <ol class="steps">
-      <li>ສະແກນ QR ຫຼື ກັອບເລກບັນຊີ ໄປໂອນໃນແອບທະນາຄານ</li>
-      <li>ໃສ່ຍອດ <b>${kip(total)}</b> ແລະ ພິມ <b class="code">${code}</b> ໃນຊ່ອງໝາຍເຫດ</li>
-      <li>ຖ່າຍໜ້າຈໍບິນ ແລ້ວອັບຂ້າງລຸ່ມນີ້</li>
+      <li>ສະແກນ QR ຫຼື ກັອບເລກບັນຊີ ໄປໂອນໃນແອບທະນາຄານ. ມີໂທລະສັບໜ່ວຍດຽວ: ກົດ <b>ບັນທຶກ QR</b> ກ່ອນ, ແລ້ວໃນແອບທະນາຄານກົດສະແກນ → ເລືອກຮູບຈາກຄັງຮູບ</li>
+      <li>ໃສ່ຍອດ <b>${kip(total)}</b> ແລະ ພິມ <b class="code">${code}</b> ໃນຊ່ອງໝາຍເຫດ (ລະຫັດນີ້ມີຢູ່ໃນຮູບ QR ທີ່ບັນທຶກນຳ)</li>
+      <li>ກັບມາໜ້ານີ້ ແລ້ວອັບຮູບບິນຂ້າງລຸ່ມນີ້</li>
     </ol>
     <label class="upload" for="slip">
       <input type="file" id="slip" accept="image/*">
@@ -836,8 +928,8 @@ function vTrack(code) {
     const mine = S.orders.filter(o => o.mine);
     return demoBar('shop') + header() + `<div class="wrap"><div class="page">
       <h1 class="page-h">ຕິດຕາມອໍເດີ</h1>
-      <form id="trackform"><div class="field"><label for="tr-code">ລະຫັດອໍເດີ</label><input id="tr-code" name="code" placeholder="PS-0124" autocapitalize="characters"></div><button class="btn chrome block" type="submit">ເບິ່ງສະຖານະ</button></form>
-      ${mine.length ? `<h2 class="grouph">ອໍເດີທີ່ສັ່ງຈາກເຄື່ອງນີ້</h2><div>${mine.map(o => `<a class="line" style="grid-template-columns:1fr auto;text-decoration:none" href="#track-${o.code}"><div><h3 class="code">${o.code}</h3><p class="sub">${dmy(o.createdAt)} · ${kip(orderTotal(o))}</p></div><span class="pill ${o.status}">${STATUS[o.status]}</span></a>`).join('')}</div>` : '<p class="note">ຕົວຢ່າງ: ລອງໃສ່ PS-0124 ຫຼື PS-0122</p>'}
+      <form id="trackform"><div class="field"><label for="tr-code">ລະຫັດອໍເດີ</label><input id="tr-code" name="code" placeholder="PV-0124" autocapitalize="characters"></div><button class="btn chrome block" type="submit">ເບິ່ງສະຖານະ</button></form>
+      ${mine.length ? `<h2 class="grouph">ອໍເດີທີ່ສັ່ງຈາກເຄື່ອງນີ້</h2><div>${mine.map(o => `<a class="line" style="grid-template-columns:1fr auto;text-decoration:none" href="#track-${o.code}"><div><h3 class="code">${o.code}</h3><p class="sub">${dmy(o.createdAt)} · ${kip(orderTotal(o))}</p></div><span class="pill ${o.status}">${STATUS[o.status]}</span></a>`).join('')}</div>` : '<p class="note">ຕົວຢ່າງ: ລອງໃສ່ PV-0124 ຫຼື PV-0122</p>'}
     </div></div>`;
   }
   const o = S.orders.find(x => x.code === code.toUpperCase()); if (!o) return notFound('ບໍ່ພົບອໍເດີ ' + code);
@@ -882,7 +974,7 @@ function vPolicy() {
 let af = 'pending_review', rejecting = null, zoom = null, addOpen = false, dropAsk = false, resetAsk = false, newImg = null, qrDraft = undefined;
 function adminChrome(tab, body) {
   const tabs = [['orders', 'ອໍເດີ', pendingCount()], ['products', 'ສິນຄ້າ'], ['drops', 'ລ໋ອດ'], ['sales', 'ຍອດຂາຍ'], ['setup', 'ຕັ້ງຄ່າ']];
-  return demoBar('admin') + `<header class="top"><div class="wrap"><a class="brand" href="#admin">PHONG-SHOP<small>ADMIN</small></a><a class="navlink" href="#shop">ເບິ່ງໜ້າຮ້ານ →</a></div></header>
+  return demoBar('admin') + `<header class="top"><div class="wrap"><a class="brand" href="#admin">PHAVORA<small>ADMIN</small></a><a class="navlink" href="#shop">ເບິ່ງໜ້າຮ້ານ →</a></div></header>
   <div class="chips"><div class="wrap">${tabs.map(t => `<a class="chip" href="#admin-${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${t[1]}${t[2] ? ` <span class="n">${t[2]}</span>` : ''}</a>`).join('')}</div></div>
   <div class="wrap"><div class="page wide">${body}</div></div>`;
 }
@@ -894,7 +986,7 @@ function vAdmin(tab) {
 function tgCard(o) {
   const wait = Date.now() - (o.slipAt || o.createdAt);
   const text = `ອໍເດີໃໝ່ ${o.code}\nຍອດຕ້ອງໂອນ: ${kip(orderTotal(o))}\nລູກຄ້າ: ${o.customer.name} · ${o.customer.phone}\nສົ່ງ: ${o.customer.courier} → ${o.customer.province}, ${o.customer.branch}\n${o.items.map(it => '• ' + itemName(it) + ' × ' + it.qty).join('\n')}${wait > REMIND_MS ? `\n\nເຕືອນຊ້ຳ: ລໍຖ້າມາ ${Math.round(wait / 60e3)} ນາທີແລ້ວ` : ''}`;
-  return `<section class="tg" aria-label="ຕົວຢ່າງແຈ້ງເຕືອນ Telegram"><div class="who">PHONG-SHOP Bot · ຕົວຢ່າງຂໍ້ຄວາມທີ່ຈະເຂົ້າ Telegram</div>
+  return `<section class="tg" aria-label="ຕົວຢ່າງແຈ້ງເຕືອນ Telegram"><div class="who">PHAVORA Bot · ຕົວຢ່າງຂໍ້ຄວາມທີ່ຈະເຂົ້າ Telegram</div>
     <div class="msg">${o.slip ? `<img src="${o.slip}" alt="ບິນ ${o.code}">` : '<span></span>'}<pre>${esc(text)}</pre></div>
     <div class="kb"><button type="button" data-act="a-confirm" data-code="${o.code}">ຢືນຢັນ</button><button type="button" data-act="a-reject" data-code="${o.code}">ປະຕິເສດ</button></div></section>`;
 }
@@ -1005,7 +1097,7 @@ function aSetup() {
     <form id="bankform" class="box" novalidate><h2>ບັນຊີຮັບເງິນ</h2>
       <div class="row2"><div class="field"><label for="bk-bank">ທະນາຄານ</label><input id="bk-bank" name="bank" value="${esc(b.bank)}"></div><div class="field"><label for="bk-name">ຊື່ບັນຊີ</label><input id="bk-name" name="name" value="${esc(b.name)}"></div></div>
       <div class="field"><label for="bk-num">ເລກບັນຊີ</label><input id="bk-num" name="number" value="${esc(b.number)}"></div>
-      <div class="field"><span class="flbl">QR ຮັບເງິນ</span><div class="acts">${qr ? `<img class="qrprev" src="${qr}" alt="QR ປັດຈຸບັນ">` : '<span class="note">ຍັງໃຊ້ QR ຕົວຢ່າງ</span>'}<label class="btn sm" for="qrfile" style="position:relative">ອັບຮູບ QR<input type="file" id="qrfile" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label></div><span class="hint">ຖ່າຍໜ້າຈໍ QR ຮັບເງິນຈາກແອບທະນາຄານ</span></div>
+      <div class="field"><span class="flbl">QR ຮັບເງິນ</span><div class="acts">${qr ? `<img class="qrprev" src="${qr}" alt="QR ປັດຈຸບັນ">` : '<span class="note">ຍັງໃຊ້ QR ຕົວຢ່າງ</span>'}<label class="btn sm" for="qrfile" style="position:relative">ອັບຮູບ QR<input type="file" id="qrfile" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label></div><span class="hint">ຖ່າຍໜ້າຈໍ QR ຮັບເງິນຈາກແອບທະນາຄານ ແລ້ວຕັດໃຫ້ເຫຼືອແຕ່ QR (ລູກຄ້າຈະບັນທຶກຮູບນີ້ໄປສະແກນ)</span></div>
       <button class="btn chrome sm" type="submit" style="justify-self:start">ບັນທຶກ</button></form>
     <div class="box"><h2>Telegram</h2><p class="muted" style="margin:0">ເຊື່ອມ bot ກັບ Telegram ຂອງຮ້ານໃນໄລຍະ 2 (ລະບົບແທ້). ຕົ້ນແບບນີ້ສະແດງຕົວຢ່າງຂໍ້ຄວາມໃນແຖບອໍເດີ.</p></div>
     <div class="box"><h2>ຂໍ້ມູນຕົ້ນແບບ</h2><p class="muted" style="margin:0">ອໍເດີ, stock ແລະ ກະຕ່າ ບັນທຶກໄວ້ໃນ browser ນີ້ເທົ່ານັ້ນ.</p>
@@ -1038,19 +1130,19 @@ function render() {
 }
 function showSplash() {
   if ($('#splash')) return;
-  const letters = [...'PHONG-SHOP'].map((ch, i) => `<span style="--i:${i}">${ch}</span>`).join('');
+  const letters = [...'PHAVORA'].map((ch, i) => `<span style="--i:${i}">${ch}</span>`).join('');
   const dust = Array.from({ length: 18 }, () => { const s = (Math.random() * 2.2 + 1).toFixed(1); return `<i style="left:${(Math.random() * 100).toFixed(1)}%;width:${s}px;height:${s}px;--dx:${Math.round(Math.random() * 60 - 30)}px;animation-duration:${(Math.random() * 8 + 7).toFixed(1)}s;animation-delay:-${(Math.random() * 12).toFixed(1)}s"></i>`; }).join('');
   const el = document.createElement('div');
   el.id = 'splash'; el.className = 'splash';
-  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'PHONG-SHOP');
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'PHAVORA');
   el.innerHTML = `<div class="sp-bg" style="background-image:url(${IMG}intro.jpg)"></div>
     <div class="sp-stage">
-      <div class="sp-artwrap"><img class="sp-art" src="${IMG}intro.jpg" alt="Hoodie ສີດຳ · PHONG-SHOP new collection 2026"></div>
+      <div class="sp-artwrap"><img class="sp-art" src="${IMG}intro.jpg" alt="Hoodie ສີດຳ · PHAVORA new collection 2026"></div>
       <div class="sp-glow"></div><div class="sp-sweep"></div>
       <div class="sp-smoke"><i></i><i></i><i></i></div>
       <div class="sp-dust">${dust}</div>
       <div class="sp-flash"></div>
-      <div class="sp-top"><small>PHONG-SHOP<br>NEW COLLECTION 2026</small><p class="sp-brand" aria-hidden="true">${letters}</p></div>
+      <div class="sp-top"><small>PHAVORA<br>NEW COLLECTION 2026</small><p class="sp-brand" aria-hidden="true">${letters}</p></div>
       <div></div>
       <div class="sp-bottom"><button type="button" class="btn sp-go shine" data-act="enter">GET STARTED <span class="arr" aria-hidden="true">→</span></button><small>WEAR YOUR ATTITUDE</small></div>
     </div>`;
@@ -1075,7 +1167,7 @@ function after(v) {
       tr.addEventListener('scroll', upd, { passive: true }); upd();
     }
   }
-  if (v === 'pay') updateTimer();
+  if (v === 'pay') { updateTimer(); paintQrCard(); }
 }
 function updateTimer() {
   const [v, a] = parse(); if (v !== 'pay') return;
@@ -1124,6 +1216,7 @@ document.addEventListener('click', e => {
     case 'blocked': e.preventDefault(); toast('ແກ້ລາຍການທີ່ມີຄຳເຕືອນກ່ອນ'); break;
     case 'courier': readCk(); ck.courier = el.dataset.v; delete ckErr.courier; render(); break;
     case 'copy': copyText(el.dataset.v); break;
+    case 'saveqr': saveQr(); break;
     case 'sendslip': {
       const [, a] = parse(); const ord = S.orders.find(x => x.code === a);
       if (!ord || ord.status !== 'awaiting_payment' || !slipData) return;
@@ -1172,7 +1265,7 @@ document.addEventListener('submit', e => {
   e.preventDefault();
   const fm = e.target;
   if (fm.id === 'ckform') submitCheckout();
-  if (fm.id === 'trackform') { const c = fm.elements.code.value.trim().toUpperCase(); if (c) location.hash = '#track-' + (c.startsWith('PS-') ? c : 'PS-' + c.replace(/^PS/, '')); }
+  if (fm.id === 'trackform') { const c = fm.elements.code.value.trim().toUpperCase(); if (c) location.hash = '#track-' + (c.startsWith('PV-') ? c : 'PV-' + c.replace(/^PV/, '')); }
   if (fm.id === 'bankform') { S.bank.bank = fm.elements.bank.value.trim() || 'BCEL'; S.bank.name = fm.elements.name.value.trim(); S.bank.number = fm.elements.number.value.trim(); if (qrDraft !== undefined) S.bank.qr = qrDraft; qrDraft = undefined; save(); render(); toast('ບັນທຶກບັນຊີແລ້ວ'); }
   if (fm.id === 'addform') {
     const g = k => (fm.elements[k] ? fm.elements[k].value.trim() : '');

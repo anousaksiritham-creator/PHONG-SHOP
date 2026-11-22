@@ -6,11 +6,13 @@
 </head>
 <body>
 <title>PHAVORA</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/icon-180.png">
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#0b0b0c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&family=Syncopate&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: phone-first column of full-bleed black bands; product grid 2 → 3 → 4 columns;
    sticky header + sticky category chips; fixed buy bar on product pages. Single dark look. */
@@ -21,7 +23,6 @@
   --low:#f0c24b; --bad:#ff6a5f; --ok:#7bd8a2;
   --f-display:"Anton","Impact","Arial Narrow Bold",sans-serif;
   --f-body:"Inter","Noto Sans Lao","Leelawadee UI","Phetsarath OT",system-ui,sans-serif;
-  --f-brand:"Syncopate","Inter",sans-serif;
   --gut-l:max(16px, env(safe-area-inset-left, 0px));
   --gut-r:max(16px, env(safe-area-inset-right, 0px));
   --head:56px;
@@ -45,7 +46,9 @@ img{max-width:100%}
 .demo a[aria-current="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(11,11,12,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .top .wrap{height:var(--head);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{font-family:var(--f-brand);font-size:14px;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
+.logo{display:block;aspect-ratio:2628/210;background:currentColor;-webkit-mask:url(img/logo.png) center/contain no-repeat;mask:url(img/logo.png) center/contain no-repeat}
+.brand{display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap;color:var(--paper);padding-block:6px}
+.brand .logo{width:132px}
 .brand small{font-family:var(--f-body);font-size:10px;letter-spacing:.14em;font-weight:700;margin-left:8px;padding:2px 6px;border:1px solid var(--line);border-radius:2px;color:var(--mute);vertical-align:middle}
 .top nav{display:flex;gap:4px;align-items:center}
 .navlink{font-size:13px;text-decoration:none;padding:8px 10px;color:var(--mute);white-space:nowrap}
@@ -145,7 +148,8 @@ img{max-width:100%}
 .how p{margin:2px 0 0;color:var(--mute);font-size:13.5px}
 .foot{border-top:1px solid var(--line);color:var(--mute);font-size:13px}
 .foot .wrap{padding-block:28px 44px;display:grid;gap:18px}
-.foot .big{font-family:var(--f-brand);letter-spacing:.34em;color:var(--paper);font-size:18px}
+.foot .big{color:var(--paper)}
+.foot .big .logo{width:min(220px,62%)}
 .foot nav{display:flex;flex-wrap:wrap;gap:8px 18px}
 .foot a,.foot button{text-decoration:none;background:none;border:0;padding:0;cursor:pointer;color:var(--mute);font-size:13px}
 .foot a:hover,.foot button:hover{color:var(--paper)}
@@ -376,11 +380,13 @@ ol.steps b{color:var(--paper)}
 .sp-dust{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
 .sp-dust i{position:absolute;bottom:-10px;border-radius:50%;background:#ffe2ad;box-shadow:0 0 6px rgba(255,210,140,.85);animation:sp-rise linear infinite}
 @keyframes sp-rise{from{transform:translate(0,0);opacity:0}12%{opacity:.9}to{transform:translate(var(--dx),-105vh);opacity:0}}
-.sp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;z-index:2}
-.sp-top small{font-size:10.5px;letter-spacing:.22em;line-height:1.55;color:#d8ccb4;animation:sp-up .8s ease-out 1.25s both}
-.sp-brand{font-family:var(--f-display);font-size:clamp(28px,8.4vw,40px);line-height:.95;color:#efe4cc;display:flex;overflow:hidden;margin:0;font-weight:400}
-.sp-brand span{display:inline-block;animation:sp-letter .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(1s + var(--i) * 45ms)}
-@keyframes sp-letter{from{transform:translateY(110%);opacity:0}to{transform:none;opacity:1}}
+.sp-top{display:grid;justify-items:center;gap:12px;z-index:2;padding-top:6px}
+.sp-top small{font-size:10.5px;letter-spacing:.42em;line-height:1.55;color:#d8ccb4;animation:sp-up .8s ease-out 1.6s both}
+/* logo wipes in left to right, then a warm metal shine keeps sliding across it */
+.sp-brand{margin:0;width:min(80%,360px);filter:drop-shadow(0 2px 14px rgba(0,0,0,.65))}
+.sp-brand .logo{width:100%;background:linear-gradient(100deg,#b9ad95 0%,#efe4cc 30%,#fffaf0 45%,#efe4cc 55%,#b9ad95 80%,#efe4cc 100%);background-size:250% 100%;animation:sp-wipe 1s cubic-bezier(.6,0,.2,1) .9s both,sp-metal 4.5s ease-in-out 2s infinite}
+@keyframes sp-wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes sp-metal{0%{background-position:100% 0}60%,100%{background-position:-50% 0}}
 @keyframes sp-up{from{transform:translateY(14px);opacity:0}}
 .sp-bottom{display:grid;justify-items:center;gap:12px;z-index:2;animation:sp-up .8s ease-out 1.95s both}
 .sp-go{background:linear-gradient(180deg,#f4ecdb,#c9b58e);color:#15110a;border:0;min-width:230px;min-height:56px;letter-spacing:.2em;font-weight:800;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:sp-pulse 2.4s ease-in-out 2.9s infinite}
@@ -559,11 +565,11 @@ function demoBar(mode) {
 }
 function header() {
   const n = cartCount();
-  return `<header class="top"><div class="wrap"><a class="brand" href="#shop" aria-label="PHAVORA ໜ້າທຳອິດ">PHAVORA</a><nav><a class="navlink" href="#track" aria-label="ອໍເດີຂອງຂ້ອຍ">ອໍເດີ</a><a class="cartbtn" href="#cart">ກະຕ່າ <span class="count${n ? '' : ' zero'}">${n}</span></a></nav></div></header>`;
+  return `<header class="top"><div class="wrap"><a class="brand" href="#shop" aria-label="PHAVORA ໜ້າທຳອິດ"><span class="logo" aria-hidden="true"></span></a><nav><a class="navlink" href="#track" aria-label="ອໍເດີຂອງຂ້ອຍ">ອໍເດີ</a><a class="cartbtn" href="#cart">ກະຕ່າ <span class="count${n ? '' : ' zero'}">${n}</span></a></nav></div></header>`;
 }
 function footer() {
   return `<footer class="foot"><div class="wrap">
-    <div class="big">PHAVORA</div>
+    <div class="big"><span class="logo" role="img" aria-label="PHAVORA"></span></div>
     <nav aria-label="ລິ້ງຮ້ານ"><a href="#track">ຕິດຕາມອໍເດີ</a><a href="#policy">ການສົ່ງ ແລະ ການປ່ຽນສິນຄ້າ</a><a href="#archive">ARCHIVE</a></nav>
     <nav aria-label="ໂຊຊຽວ"><button type="button" data-act="social">TikTok</button><button type="button" data-act="social">Facebook</button><button type="button" data-act="social">WhatsApp</button></nav>
     <span>ສົ່ງທົ່ວລາວຜ່ານ Anousith · HAL · Mixay — ຄ່າສົ່ງຈ່າຍປາຍທາງ</span>
@@ -814,6 +820,7 @@ async function buildQrCard(o) {
   const LAO = '"Noto Sans Lao","Leelawadee UI","Phetsarath OT",sans-serif', DISP = 'Anton,Impact,"Arial Narrow Bold",sans-serif';
   try { await Promise.all(['400 60px Anton', '700 30px "Noto Sans Lao"', '400 30px "Noto Sans Lao"'].map(f => document.fonts.load(f))); } catch (e) {}
   let img = null; if (b.qr) { try { img = await loadImg(b.qr); } catch (e) {} }
+  let logo = null; try { logo = await loadImg(IMG + 'logo.png'); } catch (e) {}
   const W = 1080, P = 72, BOX = 754, qy = 190;
   let qw = BOX, qh = BOX;
   if (img) { const s = Math.min(BOX / img.naturalWidth, 1000 / img.naturalHeight); qw = Math.round(img.naturalWidth * s); qh = Math.round(img.naturalHeight * s); }
@@ -822,7 +829,14 @@ async function buildQrCard(o) {
   const g = c.getContext('2d');
   g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
   g.textBaseline = 'alphabetic';
-  g.textAlign = 'left'; g.fillStyle = '#0b0b0c'; g.font = `400 76px ${DISP}`; g.fillText('PHAVORA', P, 130);
+  if (logo) {
+    // logo.png is white on transparent: paint it ink-coloured on a scratch canvas, then place it
+    const lw = 380, lh = Math.round(logo.naturalHeight * lw / logo.naturalWidth);
+    const t = document.createElement('canvas'); t.width = lw; t.height = lh;
+    const tg = t.getContext('2d'); tg.drawImage(logo, 0, 0, lw, lh);
+    tg.globalCompositeOperation = 'source-in'; tg.fillStyle = '#0b0b0c'; tg.fillRect(0, 0, lw, lh);
+    g.drawImage(t, P, Math.round(104 - lh / 2));
+  } else { g.textAlign = 'left'; g.fillStyle = '#0b0b0c'; g.font = `400 76px ${DISP}`; g.fillText('PHAVORA', P, 130); }
   g.textAlign = 'right'; g.fillStyle = '#6b6b70'; g.font = `700 28px ${LAO}`; g.fillText('ສະແກນເພື່ອໂອນ', W - P, 96);
   g.font = '700 22px Inter,sans-serif'; g.fillText('SCAN TO PAY', W - P, 130);
   const qx = Math.round((W - qw) / 2);
@@ -981,7 +995,7 @@ function vPolicy() {
 let af = 'pending_review', rejecting = null, zoom = null, addOpen = false, dropAsk = false, resetAsk = false, newImg = null, qrDraft = undefined;
 function adminChrome(tab, body) {
   const tabs = [['orders', 'ອໍເດີ', pendingCount()], ['products', 'ສິນຄ້າ'], ['drops', 'ລ໋ອດ'], ['sales', 'ຍອດຂາຍ'], ['setup', 'ຕັ້ງຄ່າ']];
-  return demoBar('admin') + `<header class="top"><div class="wrap"><a class="brand" href="#admin">PHAVORA<small>ADMIN</small></a><a class="navlink" href="#shop">ເບິ່ງໜ້າຮ້ານ →</a></div></header>
+  return demoBar('admin') + `<header class="top"><div class="wrap"><a class="brand" href="#admin" aria-label="PHAVORA Admin"><span class="logo" aria-hidden="true"></span><small>ADMIN</small></a><a class="navlink" href="#shop">ເບິ່ງໜ້າຮ້ານ →</a></div></header>
   <div class="chips"><div class="wrap">${tabs.map(t => `<a class="chip" href="#admin-${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${t[1]}${t[2] ? ` <span class="n">${t[2]}</span>` : ''}</a>`).join('')}</div></div>
   <div class="wrap"><div class="page wide">${body}</div></div>`;
 }
@@ -1137,7 +1151,6 @@ function render() {
 }
 function showSplash() {
   if ($('#splash')) return;
-  const letters = [...'PHAVORA'].map((ch, i) => `<span style="--i:${i}">${ch}</span>`).join('');
   const dust = Array.from({ length: 18 }, () => { const s = (Math.random() * 2.2 + 1).toFixed(1); return `<i style="left:${(Math.random() * 100).toFixed(1)}%;width:${s}px;height:${s}px;--dx:${Math.round(Math.random() * 60 - 30)}px;animation-duration:${(Math.random() * 8 + 7).toFixed(1)}s;animation-delay:-${(Math.random() * 12).toFixed(1)}s"></i>`; }).join('');
   const el = document.createElement('div');
   el.id = 'splash'; el.className = 'splash';
@@ -1149,7 +1162,7 @@ function showSplash() {
       <div class="sp-smoke"><i></i><i></i><i></i></div>
       <div class="sp-dust">${dust}</div>
       <div class="sp-flash"></div>
-      <div class="sp-top"><small>PHAVORA<br>NEW COLLECTION 2026</small><p class="sp-brand" aria-hidden="true">${letters}</p></div>
+      <div class="sp-top"><p class="sp-brand"><span class="logo" role="img" aria-label="PHAVORA"></span></p><small>NEW COLLECTION 2026</small></div>
       <div></div>
       <div class="sp-bottom"><button type="button" class="btn sp-go shine" data-act="enter">GET STARTED <span class="arr" aria-hidden="true">→</span></button><small>WEAR YOUR ATTITUDE</small></div>
     </div>`;

@@ -1,0 +1,1211 @@
+<!doctype html>
+<html lang="lo">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>PHONG-SHOP</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&family=Syncopate&display=swap">
+<style>
+/* Layout: phone-first column of full-bleed black bands; product grid 2 → 3 → 4 columns;
+   sticky header + sticky category chips; fixed buy bar on product pages. Single dark look. */
+:root{
+  --ink:#0b0b0c; --panel:#151517; --panel-2:#1e1e22; --line:#2c2c31;
+  --paper:#f3f3f0; --mute:#9b9ca3; --card:#e9e8e4; --card-ink:#111113;
+  --chrome-hi:#f7f8fa; --chrome-lo:#aeb2b9; --chrome:#cfd2d7;
+  --low:#f0c24b; --bad:#ff6a5f; --ok:#7bd8a2;
+  --f-display:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --f-body:"Inter","Noto Sans Lao","Leelawadee UI","Phetsarath OT",system-ui,sans-serif;
+  --f-brand:"Syncopate","Inter",sans-serif;
+  --gut-l:max(16px, env(safe-area-inset-left, 0px));
+  --gut-r:max(16px, env(safe-area-inset-right, 0px));
+  --head:56px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ink);color:var(--paper);font-family:var(--f-body);font-size:15px;line-height:1.6;min-height:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--ink)}
+a{color:inherit}
+button{font:inherit;color:inherit}
+img{max-width:100%}
+:focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+.wrap{padding-left:var(--gut-l);padding-right:var(--gut-r);max-width:1120px;margin-inline:auto}
+
+/* demo strip + header */
+.demo{background:var(--panel);border-bottom:1px solid var(--line);font-size:12px;color:var(--mute)}
+.demo .wrap{display:flex;gap:10px;align-items:center;justify-content:space-between;padding-block:6px;flex-wrap:wrap}
+.demo .sw2{display:flex;gap:6px}
+.demo a,.demo button{color:var(--paper);text-decoration:none;border:1px solid var(--line);padding:2px 10px;border-radius:99px;background:none;cursor:pointer;font-size:12px;line-height:1.6}
+.demo a[aria-current="true"]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(11,11,12,.93);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{height:var(--head);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--f-brand);font-size:14px;letter-spacing:.2em;text-decoration:none;white-space:nowrap}
+.brand small{font-family:var(--f-body);font-size:10px;letter-spacing:.14em;font-weight:700;margin-left:8px;padding:2px 6px;border:1px solid var(--line);border-radius:2px;color:var(--mute);vertical-align:middle}
+.top nav{display:flex;gap:4px;align-items:center}
+.navlink{font-size:13px;text-decoration:none;padding:8px 10px;color:var(--mute);white-space:nowrap}
+.navlink:hover{color:var(--paper)}
+.cartbtn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:99px;padding:5px 6px 5px 14px}
+.cartbtn .count{min-width:24px;height:24px;padding:0 6px;border-radius:99px;background:var(--paper);color:var(--ink);font-size:12px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.cartbtn .count.zero{background:var(--panel-2);color:var(--mute)}
+
+/* hero: tilted photo reels scrolling behind, liquid-chrome drop number, spinning badge, ticker below */
+.hero{position:relative;overflow:hidden;isolation:isolate}
+.hero-bg{position:absolute;inset:-22% -14%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;transform:rotate(-9deg);z-index:-2;opacity:.62}
+.hero-bg .col{overflow:hidden;min-width:0}
+.hero-bg .col:nth-child(n+4){display:none}
+@media(min-width:720px){.hero-bg{grid-template-columns:repeat(5,minmax(0,1fr));inset:-34% -6%}.hero-bg .col:nth-child(n+4){display:block}}
+.reel{display:flex;flex-direction:column;animation:reel-up 42s linear infinite;will-change:transform}
+.hero-bg .col:nth-child(even) .reel{animation-name:reel-down;animation-duration:50s}
+.hero-bg .col:nth-child(3) .reel{animation-duration:58s}
+.reel>div{display:grid;gap:8px;padding-bottom:8px}
+.reel img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;border-radius:3px;filter:grayscale(.45) contrast(1.08);background:var(--panel)}
+@keyframes reel-up{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+@keyframes reel-down{from{transform:translateY(-50%)}to{transform:translateY(0)}}
+.hero-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(11,11,12,.2) 0%,rgba(11,11,12,.42) 34%,rgba(11,11,12,.9) 66%,var(--ink) 100%)}
+.hero-in{position:relative;padding-block:clamp(180px,50vw,320px) 26px;display:grid;gap:14px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin:0}
+.hero .eyebrow{color:var(--chrome)}
+.drop{font-family:var(--f-display);font-weight:400;font-size:clamp(88px,27vw,220px);line-height:.84;margin:0;text-transform:uppercase;display:flex;align-items:flex-end;gap:.05em}
+.numwrap{position:relative;display:inline-block}
+.num{background:linear-gradient(100deg,#6f737a 0%,#ffffff 14%,#a3a7ae 28%,#f4f5f7 42%,#7b7f86 56%,#ffffff 70%,#989ca3 84%,#6f737a 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:chrome 5s linear infinite}
+@keyframes chrome{from{background-position:0 0}to{background-position:-200% 0}}
+.star{position:absolute;top:-.14em;right:-.3em;width:.34em;height:.34em;animation:spin 9s linear infinite,glow 2.4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{50%{filter:drop-shadow(0 0 9px rgba(255,255,255,.8))}}
+.ring{position:absolute;top:16px;right:var(--gut-r);width:clamp(96px,27vw,136px);height:auto;z-index:1;animation:spin 18s linear infinite}
+.ring text{font-family:var(--f-body);font-size:9.6px;font-weight:700;letter-spacing:.06em;fill:var(--paper)}
+.lede{margin:0;color:#c4c5ca;max-width:44ch}
+.ticker{overflow:hidden;white-space:nowrap;background:linear-gradient(180deg,var(--chrome-hi),var(--chrome-lo));color:var(--card-ink);border-block:1px solid #000}
+.ticker .tk{display:inline-flex;animation:tick 26s linear infinite;will-change:transform}
+.ticker span{font-family:var(--f-display);font-size:19px;line-height:1;padding:10px 14px 10px 0;text-transform:uppercase;letter-spacing:.02em;display:inline-flex;align-items:center;gap:14px}
+.ticker span::after{content:"";width:12px;height:12px;background:currentColor;clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+.ticker.alt{background:var(--ink);color:transparent;border-color:var(--line)}
+.ticker.alt span{-webkit-text-stroke:1px var(--chrome);font-size:28px;padding-block:12px}
+.ticker.alt span::after{background:var(--chrome)}
+.ticker.alt .tk{animation-direction:reverse;animation-duration:34s}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.hero.off *,.hero.off{animation-play-state:paused!important}
+.grain{position:fixed;inset:-50%;z-index:110;pointer-events:none;opacity:.06;background-size:160px 160px;animation:grain 1.1s steps(6) infinite}
+.is-admin .grain{display:none}
+@keyframes grain{0%,100%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-6%,-2%)}80%{transform:translate(5%,4%)}}
+
+/* buttons, chips */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border-radius:999px;border:1px solid var(--line);background:transparent;font-weight:700;font-size:15px;letter-spacing:.02em;text-decoration:none;cursor:pointer;text-align:center}
+.btn.chrome{background:linear-gradient(180deg,var(--chrome-hi),var(--chrome-lo));color:var(--card-ink);border-color:transparent;box-shadow:inset 0 1px 0 #fff,0 1px 0 rgba(0,0,0,.5)}
+.btn.shine{position:relative;overflow:hidden;isolation:isolate}
+.btn.shine::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.9) 50%,transparent 65%);transform:translateX(-120%);animation:shine 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes shine{55%,100%{transform:translateX(120%)}}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.ghost{color:var(--mute)}
+.btn.danger{border-color:#5d2b28;color:var(--bad)}
+.btn.sm{min-height:40px;padding:0 16px;font-size:14px}
+.chips{position:sticky;top:calc(env(safe-area-inset-top,0px) + var(--head));z-index:15;background:var(--ink);border-bottom:1px solid var(--line)}
+.chips .wrap{display:flex;gap:8px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.chips .wrap::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600;letter-spacing:.06em;background:transparent;cursor:pointer;color:var(--mute);text-decoration:none}
+.chip[aria-pressed="true"],.chip[aria-current="page"]{background:var(--paper);color:var(--ink);border-color:var(--paper)}
+.chip .n{opacity:.65;font-variant-numeric:tabular-nums}
+
+/* product grid */
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 10px;padding-block:16px 34px}
+@media(min-width:720px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 16px}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.card{display:grid;gap:8px;align-content:start;text-decoration:none;min-width:0}
+.ph{position:relative;aspect-ratio:4/5;background:var(--card);border-radius:4px;overflow:hidden;max-width:100%}
+.ph img{width:100%;height:100%;object-fit:cover;mix-blend-mode:multiply;display:block}
+.card.sold .ph img{opacity:.35;filter:grayscale(1)}
+.badges{position:absolute;left:8px;top:8px;display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.badge{font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:3px 7px;border-radius:2px;line-height:1.35}
+.badge.sold{background:var(--card-ink);color:var(--paper)}
+.badge.last{background:linear-gradient(180deg,var(--chrome-hi),var(--chrome-lo));color:var(--card-ink)}
+.badge.low{background:var(--low);color:#1a1405;letter-spacing:0;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.5}}
+@media(hover:hover){.card .ph img{transition:transform .5s ease}.card:hover .ph img{transform:scale(1.05)}}
+.card h3{font-size:13.5px;font-weight:600;margin:0;line-height:1.35}
+.card .price{font-size:13.5px;margin:0;color:var(--mute);font-variant-numeric:tabular-nums}
+.dots-sw{display:flex;gap:5px}
+.dots-sw i{width:11px;height:11px;border-radius:50%;border:1px solid #55555c}
+
+/* sections */
+.sec-h{font-family:var(--f-display);font-weight:400;text-transform:uppercase;font-size:30px;line-height:1;margin:0}
+.how{border-top:1px solid var(--line)}
+.how .wrap{padding-block:32px;display:grid;gap:16px}
+.how ol{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:s}
+@media(min-width:720px){.how ol{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.how li{counter-increment:s;display:grid;grid-template-columns:46px minmax(0,1fr);gap:12px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px}
+.how li::before{content:counter(s,decimal-leading-zero);font-family:var(--f-display);font-size:32px;line-height:1;color:transparent;-webkit-text-stroke:1px var(--chrome)}
+.how b{display:block}
+.how p{margin:2px 0 0;color:var(--mute);font-size:13.5px}
+.foot{border-top:1px solid var(--line);color:var(--mute);font-size:13px}
+.foot .wrap{padding-block:28px 44px;display:grid;gap:18px}
+.foot .big{font-family:var(--f-brand);letter-spacing:.34em;color:var(--paper);font-size:18px}
+.foot nav{display:flex;flex-wrap:wrap;gap:8px 18px}
+.foot a,.foot button{text-decoration:none;background:none;border:0;padding:0;cursor:pointer;color:var(--mute);font-size:13px}
+.foot a:hover,.foot button:hover{color:var(--paper)}
+
+/* product page */
+.gal{position:relative;background:var(--card);max-width:100%;overflow:hidden}
+.gal .track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.gal .track::-webkit-scrollbar{display:none}
+.gal .slide{flex:0 0 100%;scroll-snap-align:start;aspect-ratio:4/5;max-width:100%}
+.gal img{width:100%;height:100%;object-fit:cover;display:block}
+.gal img.cut{mix-blend-mode:multiply}
+.gal .dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.gal .dots i{width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,.28);transition:width .2s}
+.gal .dots i.on{background:var(--card-ink);width:18px}
+.gal.sold img{filter:grayscale(1);opacity:.45}
+.back{position:absolute;top:12px;left:max(12px,env(safe-area-inset-left,0px));width:42px;height:42px;border-radius:50%;background:rgba(11,11,12,.78);color:var(--paper);display:grid;place-items:center;text-decoration:none;font-size:19px}
+.info{display:grid;gap:18px;padding-block:20px 120px;padding-left:var(--gut-l);padding-right:var(--gut-r);min-width:0}
+.bline{display:flex;gap:6px;flex-wrap:wrap}
+.pname{font-family:var(--f-display);font-weight:400;font-size:36px;line-height:1.02;text-transform:uppercase;margin:0;text-wrap:balance}
+.plao{margin:-8px 0 0;color:var(--mute)}
+.pprice{font-size:21px;font-weight:700;margin:0;font-variant-numeric:tabular-nums}
+.opt{display:grid;gap:10px}
+.lbl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}
+.lbl b{color:var(--paper);letter-spacing:0;text-transform:none;margin-left:6px;font-weight:600}
+.sws{display:flex;gap:10px}
+.sw{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);padding:3px;background:transparent;cursor:pointer}
+.sw i{display:block;width:100%;height:100%;border-radius:50%;border:1px solid #444}
+.sw[aria-pressed="true"]{border-color:var(--paper)}
+.sizes{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px}
+.size{display:grid;justify-items:center;padding:9px 6px;border:1px solid var(--line);border-radius:4px;background:var(--panel);cursor:pointer;line-height:1.3}
+.size b{font-size:16px}
+.size small{font-size:11.5px;color:var(--mute)}
+.size.low small{color:var(--low)}
+.size[aria-pressed="true"]{border-color:var(--paper);background:var(--paper);color:var(--ink)}
+.size[aria-pressed="true"] small{color:#555}
+.size:disabled{opacity:.35;cursor:not-allowed}
+.size:disabled b{text-decoration:line-through}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+details{border-top:1px solid var(--line);padding-block:13px}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--mute);font-weight:400}
+details[open] summary::after{content:"−"}
+details p,details ul{color:var(--mute);margin:10px 0 0;font-size:14px}
+details ul{padding-left:18px}
+.tablewrap{overflow-x:auto}
+table.chart{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;font-variant-numeric:tabular-nums}
+.chart th,.chart td{padding:8px;border-bottom:1px solid var(--line);text-align:left}
+.chart th{color:var(--mute);font-weight:500;font-size:12px}
+.hscroll{display:grid;grid-auto-flow:column;grid-auto-columns:42%;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.hscroll::-webkit-scrollbar{display:none}
+@media(min-width:720px){.hscroll{grid-auto-columns:30%}}
+.buybar{position:fixed;left:0;right:0;bottom:0;z-index:25;background:rgba(11,11,12,.95);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:10px var(--gut-r) calc(10px + env(safe-area-inset-bottom,0px)) var(--gut-l)}
+.buybar .in{max-width:560px;margin-inline:auto;display:grid;gap:6px}
+.buybar .note{text-align:center;margin:0}
+@media(min-width:900px){
+  .pdp{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;max-width:1120px;margin-inline:auto;padding:24px var(--gut-r) 0 var(--gut-l)}
+  .pdp .gal{border-radius:4px;align-self:start;position:sticky;top:calc(var(--head) + 16px)}
+  .pdp .info{padding:0 0 120px}
+}
+
+/* generic pages */
+.page{padding-block:22px 48px;display:grid;gap:18px;max-width:640px}
+.page.wide{max-width:none}
+.page-h{font-family:var(--f-display);font-weight:400;font-size:38px;text-transform:uppercase;margin:0;line-height:1}
+.muted{color:var(--mute)}
+.note{font-size:13px;color:var(--mute)}
+.line{display:grid;grid-template-columns:78px minmax(0,1fr);gap:12px;padding-block:12px;border-bottom:1px solid var(--line)}
+.line h3{font-size:14px;margin:0;line-height:1.35}
+.line .sub{font-size:13px;color:var(--mute);margin:2px 0 0}
+.line .row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px;flex-wrap:wrap}
+.line .warn{color:var(--low);font-size:12.5px;margin:6px 0 0}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:99px}
+.step button{width:36px;height:34px;background:none;border:0;cursor:pointer;font-size:17px}
+.step button:disabled{opacity:.3;cursor:not-allowed}
+.step span{min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+.link{background:none;border:0;color:var(--mute);text-decoration:underline;cursor:pointer;font-size:13px;padding:0}
+.sum{display:grid;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px}
+.sum .r{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.sum .r.total{font-size:18px;font-weight:700;border-top:1px solid var(--line);padding-top:10px}
+.sum .r .mini{font-size:13px;color:var(--mute)}
+.empty{padding:44px 0;text-align:center;color:var(--mute);display:grid;gap:16px;justify-items:center}
+form{display:grid;gap:16px}
+.field{display:grid;gap:6px;min-width:0}
+.field>label,.field .flbl{font-size:13px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;min-height:48px;background:var(--panel);border:1px solid var(--line);border-radius:4px;color:var(--paper);padding:10px 12px;font:inherit;font-size:16px}
+.field textarea{min-height:76px;resize:vertical}
+.field .hint{font-size:12px;color:var(--mute)}
+.field.err input,.field.err select,.field.err .radios{border-color:var(--bad)}
+.field .msg{font-size:12px;color:var(--bad)}
+.row2{display:grid;gap:16px}
+@media(min-width:560px){.row2{grid-template-columns:1fr 1fr}}
+.radios{display:flex;flex-wrap:wrap;gap:8px;border:1px solid transparent;border-radius:6px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--paper);flex:none}
+.err-text{color:var(--bad);font-size:13px;margin:0}
+
+/* pay */
+.timer{display:flex;justify-content:space-between;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:10px 16px}
+.timer b{font-family:var(--f-display);font-size:30px;font-weight:400;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.timer.hurry b{color:var(--low)}
+.amount{font-family:var(--f-display);font-weight:400;font-size:54px;line-height:1;margin:0;font-variant-numeric:tabular-nums}
+.qrbox{background:#fff;border-radius:6px;padding:16px;display:grid;justify-items:center;gap:8px;color:#444;max-width:280px;width:100%;margin-inline:auto}
+.qrbox svg,.qrbox img{width:100%;max-width:220px;height:auto;display:block}
+.qrbox small{font-size:11.5px;text-align:center;line-height:1.4}
+dl.kv{margin:0;border:1px solid var(--line);border-radius:4px}
+dl.kv>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line)}
+dl.kv>div:last-child{border-bottom:0}
+dl.kv dt{color:var(--mute);font-size:13px;flex:none}
+dl.kv dd{margin:0;text-align:right;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;min-width:0;overflow-wrap:anywhere}
+.copy{border:1px solid var(--line);background:none;border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--mute);font-weight:500}
+.code{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;letter-spacing:.03em}
+ol.steps{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--mute);font-size:14px}
+ol.steps b{color:var(--paper)}
+.upload{position:relative;display:grid;place-items:center;gap:8px;min-height:150px;border:1.5px dashed #44444b;border-radius:6px;padding:16px;text-align:center;cursor:pointer;color:var(--mute)}
+.upload:focus-within{border-color:var(--chrome)}
+.upload input{position:absolute;opacity:0;width:1px;height:1px}
+.upload img{max-height:280px;width:auto;border-radius:4px}
+.upload .big{font-size:28px;line-height:1;color:var(--paper)}
+
+/* tracking */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;padding-bottom:18px;position:relative}
+.tl li::before{content:"";width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--ink);margin:6px 0 0 6px;z-index:1}
+.tl li::after{content:"";position:absolute;left:11px;top:20px;bottom:0;width:2px;background:var(--line)}
+.tl li:last-child{padding-bottom:0}
+.tl li:last-child::after{display:none}
+.tl li.done::before{background:var(--paper);border-color:var(--paper)}
+.tl li.done::after{background:var(--paper)}
+.tl li.now::before{border-color:var(--paper);box-shadow:0 0 0 4px rgba(243,243,240,.16)}
+.tl li.off{opacity:.45}
+.tl b{display:block}
+.tl small{color:var(--mute)}
+.banner{border-radius:4px;padding:14px 16px;border:1px solid var(--line);background:var(--panel);display:grid;gap:4px}
+.banner.bad{border-color:#5d2b28;background:#1d100f;color:#ffbcb6}
+.banner.ok{border-color:#24563a;background:#0f1a14;color:#bdeccf}
+.banner.warn{border-color:#6b5414;background:#1b1608;color:#f6dc93}
+.banner b{color:inherit}
+
+/* admin */
+.ocard{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;display:grid;gap:10px;min-width:0}
+.ocard.alert{border-color:#6b5414}
+.olist{display:grid;gap:12px}
+@media(min-width:900px){.olist{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}}
+.ohead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.ohead .code{font-weight:700;font-size:15px}
+.pill{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+.pill.pending_review{background:var(--low);color:#1a1405;border-color:transparent}
+.pill.preparing{background:var(--paper);color:var(--ink);border-color:transparent}
+.pill.shipped{border-color:var(--chrome);color:var(--chrome)}
+.pill.done{color:var(--ok);border-color:#24563a}
+.pill.rejected,.pill.expired,.pill.cancelled{color:var(--bad);border-color:#5d2b28}
+.pill.awaiting_payment{color:var(--mute)}
+.pill.live{background:var(--ok);color:#06210f;border-color:transparent}
+.ogrid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+.ogrid p{margin:0;font-size:13.5px}
+.ogrid ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--mute)}
+.slipthumb{width:74px;height:98px;object-fit:cover;border-radius:3px;border:1px solid var(--line);cursor:zoom-in;background:#fff;padding:0;display:block}
+.slipbtn{padding:0;border:0;background:none;cursor:zoom-in}
+.acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.acts input{min-height:40px;background:var(--ink);border:1px solid var(--line);border-radius:4px;color:var(--paper);padding:6px 10px;font:inherit;font-size:15px;flex:1 1 140px;min-width:0}
+.alertline{font-size:12.5px;color:var(--low);margin:0}
+.reasons{display:grid;gap:8px;border-top:1px dashed var(--line);padding-top:10px}
+.tg{background:#17212b;border:1px solid #26384a;border-radius:12px;padding:12px;display:grid;gap:10px;font-size:13.5px;color:#e9eef3;max-width:520px}
+.tg .who{font-size:12px;color:#6ab3f3;font-weight:600}
+.tg .msg{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:start}
+.tg .msg img{width:64px;height:86px;object-fit:cover;border-radius:6px;background:#fff}
+.tg pre{white-space:pre-wrap;font-family:inherit;margin:0;line-height:1.5}
+.tg .kb{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tg .kb button{background:#2b5278;border:0;border-radius:6px;padding:9px;color:#fff;font-weight:600;cursor:pointer}
+.prow{display:grid;grid-template-columns:58px minmax(0,1fr);gap:12px;padding-block:14px;border-bottom:1px solid var(--line)}
+.prow .ph{aspect-ratio:4/5}
+.prow h3{margin:0;font-size:14px;line-height:1.35}
+.prow .sub{margin:2px 0 0;font-size:12.5px;color:var(--mute);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stockgrid{display:grid;gap:8px;margin-top:10px}
+.srow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px}
+.srow .clab{min-width:86px;color:var(--mute)}
+.scell{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:4px;padding:2px}
+.scell span{font-size:11px;color:var(--mute);padding:0 4px}
+.scell b{min-width:24px;text-align:center;font-weight:600;font-variant-numeric:tabular-nums}
+.scell b.z{color:var(--bad)}
+.scell button{width:28px;height:28px;border:0;background:var(--panel-2);border-radius:3px;cursor:pointer}
+.grouph{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);margin:18px 0 0}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(min-width:720px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;display:grid;gap:2px;min-width:0}
+.stat small{color:var(--mute);font-size:12px}
+.stat b{font-family:var(--f-display);font-weight:400;font-size:26px;font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
+.bars{display:grid;gap:12px}
+.bar{display:grid;grid-template-columns:96px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px;font-variant-numeric:tabular-nums}
+.bar .tr{height:10px;background:var(--panel-2);border-radius:5px;overflow:hidden}
+.bar .fill{height:100%;background:linear-gradient(90deg,var(--chrome-lo),var(--chrome-hi));border-radius:5px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px;display:grid;gap:12px}
+.box h2{margin:0;font-size:16px}
+.dropc{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.dropc .nm{font-family:var(--f-display);font-size:26px;line-height:1}
+.qrprev{width:120px;height:120px;object-fit:contain;background:#fff;border-radius:4px;padding:6px}
+
+/* intro splash: light flash, poster reveal, breathing zoom, drifting smoke, warm sweep, rising dust */
+.has-splash{overflow:hidden}
+.splash{position:fixed;inset:0;z-index:100;background:#0a0806;display:grid;justify-items:center;overflow:hidden;color:#efe6d3}
+.splash.out{animation:sp-out .75s ease-in forwards;pointer-events:none}
+@keyframes sp-out{to{opacity:0;visibility:hidden}}
+.sp-bg{position:absolute;inset:-12%;background-size:cover;background-position:center;filter:blur(42px) brightness(.32) saturate(1.2);transform:scale(1.1)}
+.sp-stage{position:relative;width:min(100%,480px);height:100%;display:grid;grid-template-rows:auto 1fr auto;isolation:isolate;padding-top:calc(env(safe-area-inset-top,0px) + 18px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 22px);padding-left:var(--gut-l);padding-right:var(--gut-r)}
+.sp-artwrap{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);max-height:100%;overflow:hidden;z-index:-2;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 5%,#000 86%,transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 5%,#000 86%,transparent 100%);animation:sp-reveal 1.5s cubic-bezier(.2,.7,.1,1) .35s both}
+@keyframes sp-reveal{from{clip-path:inset(50% 0 50% 0);filter:brightness(0)}55%{filter:brightness(1.5)}to{clip-path:inset(0 0 0 0);filter:brightness(1)}}
+.sp-art{display:block;width:100%;height:auto;transform-origin:50% 35%;animation:sp-breathe 14s ease-in-out 1.9s infinite alternate}
+@keyframes sp-breathe{from{transform:scale(1)}to{transform:scale(1.08) translateY(-1.5%)}}
+.sp-flash{position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,transparent,#ffd99a,transparent);box-shadow:0 0 26px 6px rgba(255,196,120,.45);transform:scaleX(0);opacity:0;animation:sp-flash 1.1s ease-out .1s both;z-index:3}
+@keyframes sp-flash{10%{opacity:1}45%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+.sp-glow{position:absolute;left:50%;top:36%;width:130%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(255,196,120,.26),transparent 60%);mix-blend-mode:screen;z-index:-1;animation:sp-flicker 4.2s ease-in-out 1.5s infinite;opacity:.8}
+@keyframes sp-flicker{0%,100%{opacity:.75}42%{opacity:1}47%{opacity:.5}52%{opacity:.95}}
+.sp-sweep{position:absolute;inset:0;z-index:-1;background:linear-gradient(115deg,transparent 42%,rgba(255,226,170,.2) 50%,transparent 58%);background-size:260% 100%;background-position:130% 0;mix-blend-mode:screen;animation:sp-sweep 6.5s ease-in-out 2.2s infinite}
+@keyframes sp-sweep{0%{background-position:130% 0}55%,100%{background-position:-130% 0}}
+.sp-smoke{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.sp-smoke i{position:absolute;width:90%;height:36%;border-radius:50%;background:radial-gradient(ellipse at center,rgba(214,188,146,.34),transparent 70%);filter:blur(18px);mix-blend-mode:screen;animation:sp-drift 16s ease-in-out infinite alternate}
+.sp-smoke i:nth-child(1){left:-42%;top:50%}
+.sp-smoke i:nth-child(2){right:-46%;top:28%;animation-duration:21s;animation-direction:alternate-reverse}
+.sp-smoke i:nth-child(3){left:-20%;bottom:-8%;width:140%;animation-duration:25s;opacity:.8}
+@keyframes sp-drift{from{transform:translateX(-8%) scale(1)}to{transform:translateX(18%) scale(1.25)}}
+.sp-dust{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.sp-dust i{position:absolute;bottom:-10px;border-radius:50%;background:#ffe2ad;box-shadow:0 0 6px rgba(255,210,140,.85);animation:sp-rise linear infinite}
+@keyframes sp-rise{from{transform:translate(0,0);opacity:0}12%{opacity:.9}to{transform:translate(var(--dx),-105vh);opacity:0}}
+.sp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;z-index:2}
+.sp-top small{font-size:10.5px;letter-spacing:.22em;line-height:1.55;color:#d8ccb4;animation:sp-up .8s ease-out 1.25s both}
+.sp-brand{font-family:var(--f-display);font-size:clamp(28px,8.4vw,40px);line-height:.95;color:#efe4cc;display:flex;overflow:hidden;margin:0;font-weight:400}
+.sp-brand span{display:inline-block;animation:sp-letter .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(1s + var(--i) * 45ms)}
+@keyframes sp-letter{from{transform:translateY(110%);opacity:0}to{transform:none;opacity:1}}
+@keyframes sp-up{from{transform:translateY(14px);opacity:0}}
+.sp-bottom{display:grid;justify-items:center;gap:12px;z-index:2;animation:sp-up .8s ease-out 1.95s both}
+.sp-go{background:linear-gradient(180deg,#f4ecdb,#c9b58e);color:#15110a;border:0;min-width:230px;min-height:56px;letter-spacing:.2em;font-weight:800;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.6);animation:sp-pulse 2.4s ease-in-out 2.9s infinite}
+.sp-go .arr{display:inline-block;transition:transform .3s}
+.sp-go:hover .arr{transform:translateX(5px)}
+@keyframes sp-pulse{50%{box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 30px 4px rgba(255,208,140,.5)}}
+.sp-bottom small{font-size:10.5px;letter-spacing:.42em;color:#bfb39b}
+.splash.out .sp-art{animation:none;transform:scale(1.3);transition:transform .75s ease-in}
+
+/* add-to-cart flight */
+.fly{position:fixed;z-index:70;object-fit:cover;pointer-events:none;background:var(--card);border-radius:4px;box-shadow:0 14px 34px rgba(0,0,0,.55)}
+.count.bump{animation:bump .55s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bump{35%{transform:scale(1.7)}100%{transform:scale(1)}}
+.cartbtn.hit{animation:hit .7s ease-out}
+@keyframes hit{0%{box-shadow:0 0 0 0 rgba(243,243,240,.6)}100%{box-shadow:0 0 0 14px rgba(243,243,240,0)}}
+
+.overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.88);display:grid;place-items:center;padding:24px;cursor:zoom-out}
+.overlay img{max-height:88vh;max-width:100%;border-radius:4px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:60;background:var(--paper);color:var(--ink);padding:10px 16px;border-radius:99px;font-size:14px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.55);max-width:calc(100% - 32px);display:flex;gap:12px;align-items:center}
+.toast a{color:var(--ink);font-weight:700}
+@media (prefers-reduced-motion:no-preference){.toast{animation:pop .2s ease-out}}
+@media (prefers-reduced-motion:reduce){.reel,.ticker .tk,.star,.ring,.grain,.num,.badge.low,.btn.shine::after,.shake,.splash *,.count.bump,.cartbtn.hit{animation:none!important}.splash.out{animation-duration:.01s}.gal .dots i,.card .ph img{transition:none}}
+@keyframes pop{from{opacity:0;transform:translate(-50%,8px)}}
+</style>
+
+<div id="app"></div>
+<div id="toast-root" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const IMG = 'img/';
+const KEY = 'phongshop-proto-v1';
+const HOLD_MS = 15 * 60e3, REMIND_MS = 30 * 60e3;
+const CAT = { tops: 'TOPS', bottoms: 'BOTTOMS', acc: 'ACC' };
+const CHARTS = {
+  top: { head: ['ໄຊ', 'ອົກ (cm)', 'ຍາວ (cm)'], rows: [['M', 112, 72], ['L', 118, 74], ['XL', 124, 76]] },
+  pant: { head: ['ໄຊ', 'ແອວ (cm)', 'ຍາວ (cm)'], rows: [['M', '64–84', 100], ['L', '68–88', 102], ['XL', '72–92', 104]] }
+};
+const PROVINCES = ['ນະຄອນຫຼວງວຽງຈັນ', 'ຜົ້ງສາລີ', 'ຫຼວງນ້ຳທາ', 'ອຸດົມໄຊ', 'ບໍ່ແກ້ວ', 'ຫຼວງພະບາງ', 'ຫົວພັນ', 'ໄຊຍະບູລີ', 'ຊຽງຂວາງ', 'ວຽງຈັນ', 'ບໍລິຄຳໄຊ', 'ຄຳມ່ວນ', 'ສະຫວັນນະເຂດ', 'ສາລະວັນ', 'ເຊກອງ', 'ຈຳປາສັກ', 'ອັດຕະປື', 'ໄຊສົມບູນ'];
+const COURIERS = ['Anousith', 'HAL', 'Mixay', 'ອື່ນໆ'];
+const STATUS = { awaiting_payment: 'ລໍຖ້າໂອນເງິນ', pending_review: 'ລໍຖ້າກວດບິນ', preparing: 'ກຳລັງກຽມເຄື່ອງ', shipped: 'ສົ່ງແລ້ວ', done: 'ສຳເລັດ', rejected: 'ຖືກປະຕິເສດ', expired: 'ໝົດເວລາ', cancelled: 'ຍົກເລີກ' };
+const PAID = ['preparing', 'shipped', 'done'];
+const SOURCES = { tiktok: 'TikTok', facebook: 'Facebook', direct: 'ເຂົ້າໂດຍກົງ' };
+const REASONS = ['ຍອດເງິນບໍ່ຄົບ', 'ບໍ່ພົບເງິນເຂົ້າບັນຊີ', 'ບິນບໍ່ຊັດ ຫຼື ບໍ່ຖືກຕ້ອງ'];
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const kip = n => Number(n).toLocaleString('en-US') + ' ₭';
+const src = x => (x.startsWith('data:') ? x : IMG + x + '.jpg');
+const hhmm = t => new Date(t).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+const dmy = t => new Date(t).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+const ago = t => { const m = Math.max(0, Math.round((Date.now() - t) / 60e3)); if (m < 1) return 'ຫາກໍ'; if (m < 60) return m + ' ນາທີກ່ອນ'; const h = Math.round(m / 60); if (h < 24) return h + ' ຊົ່ວໂມງກ່ອນ'; return Math.round(h / 24) + ' ມື້ກ່ອນ'; };
+
+/* ---------- seed data (example only) ---------- */
+function slipPlaceholder(code, amount, at) {
+  try {
+    const c = document.createElement('canvas'); c.width = 360; c.height = 560;
+    const g = c.getContext('2d');
+    g.fillStyle = '#f5f5f5'; g.fillRect(0, 0, 360, 560);
+    g.fillStyle = '#3b3b3b'; g.fillRect(0, 0, 360, 68);
+    g.fillStyle = '#fff'; g.font = 'bold 19px sans-serif'; g.fillText('ບິນໂອນເງິນ (ຕົວຢ່າງ)', 20, 42);
+    g.fillStyle = '#2e9e5b'; g.beginPath(); g.arc(180, 136, 32, 0, 7); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = 6; g.beginPath(); g.moveTo(165, 136); g.lineTo(176, 148); g.lineTo(197, 124); g.stroke();
+    g.fillStyle = '#222'; g.font = 'bold 30px sans-serif'; g.textAlign = 'center';
+    g.fillText(amount.toLocaleString('en-US') + ' LAK', 180, 222);
+    const rows = [['ໄປຫາ', 'PHONG-SHOP SHOP'], ['ໝາຍເຫດ', code], ['ເວລາ', new Date(at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })]];
+    g.font = '16px sans-serif';
+    rows.forEach((r, i) => { g.textAlign = 'left'; g.fillStyle = '#888'; g.fillText(r[0], 24, 292 + i * 44); g.textAlign = 'right'; g.fillStyle = '#222'; g.fillText(r[1], 336, 292 + i * 44); });
+    g.textAlign = 'center'; g.fillStyle = '#aaa'; g.font = '12px sans-serif'; g.fillText('ຮູບຕົວຢ່າງສຳລັບຕົ້ນແບບ', 180, 528);
+    return c.toDataURL('image/jpeg', 0.8);
+  } catch (e) { return null; }
+}
+
+function seed() {
+  const now = Date.now(), H = 3600e3, M = 60e3;
+  const products = [
+    { id: 'pg-pants', name: 'Pretty Girl Parachute Pants', lao: 'ກາງເກງ parachute ຂາກວ້າງ ປັກ Pretty Girl, ແອວຢາງຢືດ, ປາຍຂາຮູດສາຍໄດ້', cat: 'bottoms', price: 229000, drop: '01', chart: 'pant', colors: [
+      { key: 'black', label: 'Black', hex: '#151515', imgs: ['pg-black-1', 'pg-black-2', 'pg-black-3'], stock: { M: 2, L: 4, XL: 0 } },
+      { key: 'grey', label: 'Grey', hex: '#a9aaa8', imgs: ['pg-grey-1', 'pg-grey-2', 'pg-grey-3'], stock: { M: 4, L: 3, XL: 1 } }] },
+    { id: 'cross-pants', name: 'Cross Sash Wide Pants', lao: 'ກາງເກງຂາກວ້າງ ຜ້າຟອກສີດຳ ລາຍໄມ້ກາງແຂນ ມີຜ້າຜູກແອວ', cat: 'bottoms', price: 229000, drop: '01', chart: 'pant', colors: [
+      { key: 'black', label: 'Washed Black', hex: '#1d2020', imgs: ['cross-1', 'cross-2', 'cross-3'], stock: { M: 3, L: 5, XL: 2 } }] },
+    { id: 'nb80', name: 'Newblood 80 Mesh Jersey', lao: 'ເສື້ອ jersey ຜ້າຕາໜ່າງ ໂທນດຳ-ຂາວ ຊົງ oversize', cat: 'tops', price: 189000, drop: '01', chart: 'top', colors: [
+      { key: 'bw', label: 'Black / White', hex: '#141414', imgs: ['nb80-1', 'nb80-2', 'nb80-3'], stock: { M: 4, L: 2, XL: 4 } }] },
+    { id: 'r99', name: 'Retro Jersey 99', lao: 'ເສື້ອ jersey ສີຄຣີມ ຕັດຕໍ່ສີເທົາເຂັ້ມ ຊົງ oversize', cat: 'tops', price: 189000, drop: '01', chart: 'top', colors: [
+      { key: 'cream', label: 'Cream / Charcoal', hex: '#d8d2c2', imgs: ['r99-1', 'r99-2', 'r99-3'], stock: { M: 6, L: 4, XL: 3 } }] },
+    { id: 'script-ls', name: 'Script Sleeve Long Tee', lao: 'ເສື້ອແຂນຍາວສີດຳ ລາຍໜັງສືຂຽນມືຕາມແຂນ ຜ້າຝ້າຍໜາ', cat: 'tops', price: 189000, drop: '01', chart: 'top', colors: [
+      { key: 'black', label: 'Black', hex: '#121212', imgs: ['script-1', 'script-2', 'script-3'], stock: { M: 1, L: 4, XL: 6 } }] },
+    { id: 'j21', name: 'Field Jersey 21', lao: 'ເສື້ອ jersey ສີຂາວ ເບີ 21 ສີກົມທ່າ ຊົງ oversize', cat: 'tops', price: 189000, drop: '01', chart: 'top', colors: [
+      { key: 'white', label: 'White / Navy', hex: '#f2f2f2', imgs: ['j21-1', 'j21-2', 'j21-3'], stock: { M: 0, L: 0, XL: 0 } }] },
+    { id: 'glasses', name: 'Rimless Cross Glasses', lao: 'ແວ່ນບໍ່ມີຂອບ ເລນສີຊາ ຂາແວ່ນລາຍໄມ້ກາງແຂນສີເງິນ', cat: 'acc', price: 89000, drop: '01', chart: null, colors: [
+      { key: 'silver', label: 'Silver / Black', hex: '#c9ccd1', imgs: ['glasses-1', 'glasses-2', 'glasses-3'], stock: { FREE: 7 } }] },
+    { id: 'belt', name: 'Slim Leather Belt', lao: 'ເຂັມຂັດໜັງ PU ໜ້າແຄບ ຫົວເຂັມຂັດສີເງິນ', cat: 'acc', price: 89000, drop: '00', chart: null, colors: [
+      { key: 'black', label: 'Black', hex: '#141414', imgs: ['belt-black-1', 'belt-black-2', 'belt-3'], stock: { FREE: 1 } },
+      { key: 'brown', label: 'Brown', hex: '#6b3a22', imgs: ['belt-brown-1', 'belt-brown-2', 'belt-3'], stock: { FREE: 1 } }] },
+    { id: 'keychain', name: '8-Ball Charm Keychain', lao: 'ພວງກະແຈ ລູກ 8, ລູກເຕົ໋າ ແລະ ດາວສີເງິນ ຕິດກະເປົາໄດ້', cat: 'acc', price: 89000, drop: '00', chart: null, colors: [
+      { key: 'mix', label: 'Black / Silver', hex: '#222', imgs: ['keychain-1', 'keychain-2', 'keychain-3'], stock: { FREE: 2 } }] },
+    { id: 'skeleton-ls', name: 'Skeleton Long Tee', lao: 'ເສື້ອແຂນຍາວສີຂາວ ລາຍກະດູກແບບແຕ້ມມື ຊົງ oversize', cat: 'tops', price: 189000, drop: '00', chart: 'top', colors: [
+      { key: 'white', label: 'White', hex: '#eeeeee', imgs: ['skeleton-1', 'skeleton-2', 'skeleton-3'], stock: { M: 0, L: 0, XL: 0 } }] }
+  ];
+  const o4 = now - 38 * M;
+  return {
+    v: 1, current: '01', nextCode: 125, cart: [], customer: null,
+    drops: [{ id: '00', name: 'DROP 00', month: 'OCT 2026' }, { id: '01', name: 'DROP 01', month: 'NOV 2026' }],
+    bank: { bank: 'BCEL', name: 'PHONG-SHOP SHOP (ຕົວຢ່າງ)', number: '010-12-00-01234567-001', qr: null },
+    products,
+    orders: [
+      { code: 'PS-0124', createdAt: o4, slipAt: o4 + 3 * M, status: 'pending_review', drop: '01', source: 'tiktok', demo: true,
+        items: [{ pid: 'pg-pants', color: 'black', size: 'L', qty: 1, price: 229000 }],
+        customer: { name: 'ແກ້ວ', phone: '020 2345 6789', courier: 'Anousith', province: 'ຈຳປາສັກ', branch: 'ເມືອງປາກເຊ · ສາຂາຕະຫຼາດດາວເຮືອງ', note: '' },
+        slip: slipPlaceholder('PS-0124', 229000, o4 + 3 * M) },
+      { code: 'PS-0123', createdAt: now - 3 * H, slipAt: now - 3 * H + 5 * M, confirmedAt: now - 2 * H, status: 'preparing', drop: '01', source: 'tiktok', demo: true,
+        items: [{ pid: 'nb80', color: 'bw', size: 'M', qty: 1, price: 189000 }, { pid: 'keychain', color: 'mix', size: 'FREE', qty: 1, price: 89000 }],
+        customer: { name: 'ຕຸ້ຍ', phone: '020 9898 1123', courier: 'Mixay', province: 'ນະຄອນຫຼວງວຽງຈັນ', branch: 'ເມືອງໄຊເສດຖາ · ສາຂາໂພນຕ້ອງ', note: 'ຂໍຫໍ່ກັນນ້ຳ' }, slip: null },
+      { code: 'PS-0122', createdAt: now - 26 * H, confirmedAt: now - 25 * H, shippedAt: now - 22 * H, status: 'shipped', tracking: 'HAL-220931', drop: '01', source: 'facebook', demo: true,
+        items: [{ pid: 'cross-pants', color: 'black', size: 'L', qty: 1, price: 229000 }],
+        customer: { name: 'ນ້ອຍ', phone: '020 7777 3402', courier: 'HAL', province: 'ສະຫວັນນະເຂດ', branch: 'ເມືອງໄກສອນ · ສາຂາໃຈກາງ', note: '' }, slip: null },
+      { code: 'PS-0121', createdAt: now - 50 * H, confirmedAt: now - 49 * H, shippedAt: now - 46 * H, status: 'done', tracking: 'ANS-58102', drop: '01', source: 'tiktok', demo: true,
+        items: [{ pid: 'r99', color: 'cream', size: 'L', qty: 1, price: 189000 }, { pid: 'belt', color: 'black', size: 'FREE', qty: 1, price: 89000 }],
+        customer: { name: 'ສົມພອນ', phone: '020 5555 1201', courier: 'Anousith', province: 'ຫຼວງພະບາງ', branch: 'ເມືອງຫຼວງພະບາງ · ສາຂາບ້ານໂພນໄຊ', note: '' }, slip: null }
+    ]
+  };
+}
+
+/* ---------- store (this browser only) ---------- */
+function load() {
+  try { const raw = localStorage.getItem(KEY); if (raw) { const s = JSON.parse(raw); if (s && s.v === 1) return s; } } catch (e) {}
+  return seed();
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch (e) { toast('ບັນທຶກຂໍ້ມູນໃນເຄື່ອງບໍ່ໄດ້ (ພື້ນທີ່ເຕັມ)'); }
+}
+let S = load();
+
+const P = id => S.products.find(p => p.id === id);
+const colorOf = (p, k) => p && p.colors.find(c => c.key === k);
+const colorTotal = c => Object.values(c.stock).reduce((a, b) => a + b, 0);
+const totalStock = p => p.colors.reduce((a, c) => a + colorTotal(c), 0);
+const isLast = p => p.drop !== S.current && totalStock(p) > 0;
+const inShop = p => p.drop === S.current || totalStock(p) > 0;
+const inArchive = p => p.drop !== S.current && totalStock(p) === 0;
+const orderTotal = o => o.items.reduce((a, i) => a + i.price * i.qty, 0);
+const cartCount = () => S.cart.reduce((a, l) => a + l.qty, 0);
+const dropOf = id => S.drops.find(d => d.id === id) || { id, name: 'DROP ' + id, month: '' };
+const pendingCount = () => S.orders.filter(o => o.status === 'pending_review').length;
+const itemName = it => { const p = P(it.pid); const c = colorOf(p, it.color); return (p ? p.name : it.pid) + (p && p.colors.length > 1 && c ? ' · ' + c.label : '') + (it.size !== 'FREE' ? ' · ' + it.size : ''); };
+function lowText(p) {
+  const t = totalStock(p); if (t === 0) return '';
+  return t <= 3 ? 'ເຫຼືອ ' + t + ' ໂຕ' : '';
+}
+function restock(o) { o.items.forEach(it => { const c = colorOf(P(it.pid), it.color); if (c) c.stock[it.size] = (c.stock[it.size] || 0) + it.qty; }); }
+function reserve(items) {
+  for (const it of items) { const c = colorOf(P(it.pid), it.color); if (!c || (c.stock[it.size] || 0) < it.qty) return it; }
+  items.forEach(it => { colorOf(P(it.pid), it.color).stock[it.size] -= it.qty; });
+  return null;
+}
+function sweep() {
+  const now = Date.now(); let changed = false;
+  S.orders.forEach(o => { if (o.status === 'awaiting_payment' && o.expiresAt < now) { o.status = 'expired'; restock(o); changed = true; } });
+  if (changed) save();
+}
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg, link) {
+  const root = $('#toast-root');
+  root.innerHTML = `<div class="toast" role="status"><span>${esc(msg)}</span>${link ? `<a href="${link.href}">${esc(link.label)}</a>` : ''}</div>`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { root.innerHTML = ''; }, 3200);
+}
+
+/* ---------- shared chrome ---------- */
+function demoBar(mode) {
+  const n = pendingCount();
+  return `<div class="demo"><div class="wrap"><span>ຕົ້ນແບບ · ຂໍ້ມູນສົມມຸດ ບັນທຶກໄວ້ໃນເຄື່ອງນີ້ເທົ່ານັ້ນ</span><span class="sw2"><button type="button" data-act="intro">Intro</button><a href="#shop" aria-current="${mode === 'shop'}">ໜ້າຮ້ານ</a><a href="#admin" aria-current="${mode === 'admin'}">Admin${n ? ' (' + n + ')' : ''}</a></span></div></div>`;
+}
+function header() {
+  const n = cartCount();
+  return `<header class="top"><div class="wrap"><a class="brand" href="#shop" aria-label="PHONG-SHOP ໜ້າທຳອິດ">PHONG-SHOP</a><nav><a class="navlink" href="#track" aria-label="ອໍເດີຂອງຂ້ອຍ">ອໍເດີ</a><a class="cartbtn" href="#cart">ກະຕ່າ <span class="count${n ? '' : ' zero'}">${n}</span></a></nav></div></header>`;
+}
+function footer() {
+  return `<footer class="foot"><div class="wrap">
+    <div class="big">PHONG-SHOP</div>
+    <nav aria-label="ລິ້ງຮ້ານ"><a href="#track">ຕິດຕາມອໍເດີ</a><a href="#policy">ການສົ່ງ ແລະ ການປ່ຽນສິນຄ້າ</a><a href="#archive">ARCHIVE</a></nav>
+    <nav aria-label="ໂຊຊຽວ"><button type="button" data-act="social">TikTok</button><button type="button" data-act="social">Facebook</button><button type="button" data-act="social">WhatsApp</button></nav>
+    <span>ສົ່ງທົ່ວລາວຜ່ານ Anousith · HAL · Mixay — ຄ່າສົ່ງຈ່າຍປາຍທາງ</span>
+  </div></footer>`;
+}
+function card(p) {
+  const t = totalStock(p), c = p.colors[0], sold = t === 0, b = [];
+  if (sold) b.push('<span class="badge sold">SOLD OUT</span>');
+  else { if (isLast(p)) b.push('<span class="badge last">LAST PIECES</span>'); const low = lowText(p); if (low) b.push(`<span class="badge low">${low}</span>`); }
+  const sw = p.colors.length > 1 ? `<div class="dots-sw" aria-label="${p.colors.length} ສີ">${p.colors.map(x => `<i style="background:${esc(x.hex)}"></i>`).join('')}</div>` : '';
+  return `<a class="card${sold ? ' sold' : ''}" href="#product-${p.id}"><div class="ph"><img src="${src(c.imgs[0])}" alt="${esc(p.name)}" loading="lazy"><div class="badges">${b.join('')}</div></div><div><h3>${esc(p.name)}</h3><p class="price">${kip(p.price)}</p>${sw}</div></a>`;
+}
+function notFound(msg) {
+  return demoBar('shop') + header() + `<div class="wrap"><div class="empty"><p>${esc(msg || 'ບໍ່ພົບໜ້ານີ້')}</p><a class="btn" href="#shop">ກັບໜ້າຮ້ານ</a></div></div>`;
+}
+
+/* ---------- shop ---------- */
+const STAR = `<svg class="star" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="chr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".42" stop-color="#9ea2a9"/><stop offset=".58" stop-color="#eef0f3"/><stop offset="1" stop-color="#5f636a"/></linearGradient></defs><path d="M50 0C53 35 65 47 100 50C65 53 53 65 50 100C47 65 35 53 0 50C35 47 47 35 50 0Z" fill="url(#chr)"/></svg>`;
+const RING = `<svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="ringp" d="M60,60 m-45,0 a45,45 0 1,1 90,0 a45,45 0 1,1 -90,0"/><linearGradient id="chr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#9ea2a9"/><stop offset="1" stop-color="#e9ebee"/></linearGradient></defs><circle cx="60" cy="60" r="58" fill="rgba(11,11,12,.74)" stroke="#45454c"/><text><textPath href="#ringp" textLength="280" lengthAdjust="spacing">LIMITED DROP ✦ ໝົດແລ້ວໝົດເລີຍ ✦ PHONG-SHOP ✦</textPath></text><path d="M60 40C61.6 54 66 58.4 80 60C66 61.6 61.6 66 60 80C58.4 66 54 61.6 40 60C54 58.4 58.4 54 60 40Z" fill="url(#chr2)"/></svg>`;
+function ticker(words, cls) {
+  const half = [...words, ...words, ...words].map(w => `<span>${esc(w)}</span>`).join('');
+  return `<div class="ticker${cls ? ' ' + cls : ''}" aria-hidden="true"><div class="tk">${half}${half}</div></div>`;
+}
+let filter = 'all';
+function vShop() {
+  const list = S.products.filter(inShop);
+  const rank = p => (totalStock(p) === 0 ? 2 : isLast(p) ? 1 : 0);
+  list.sort((a, b) => rank(a) - rank(b));
+  const cats = ['tops', 'bottoms', 'acc'].filter(k => list.some(p => p.cat === k));
+  if (filter !== 'all' && !cats.includes(filter)) filter = 'all';
+  const shown = filter === 'all' ? list : list.filter(p => p.cat === filter);
+  const d = dropOf(S.current);
+  const fresh = list.filter(p => p.drop === S.current).length, last = list.filter(isLast).length;
+  const pool = list.flatMap(p => p.colors.flatMap(c => c.imgs.slice(1))).filter((x, i, a) => a.indexOf(x) === i);
+  const cols = pool.length ? [0, 1, 2, 3, 4].map(k => { const half = Array.from({ length: 7 }, (_, j) => `<img src="${src(pool[(k * 3 + j) % pool.length])}" alt="" decoding="async">`).join(''); return `<div class="col"><div class="reel"><div>${half}</div><div>${half}</div></div></div>`; }).join('') : '';
+  const lede = fresh ? `ລ໋ອດນີ້ມີ ${fresh} ແບບໃໝ່${last ? ' ແລະ ' + last + ' ແບບທີ່ເຫຼືອຈາກລ໋ອດກ່ອນ' : ''}. ສິນຄ້າມາເປັນລ໋ອດ ໝົດແລ້ວໝົດເລີຍ.` : `ສິນຄ້າໃໝ່ກຳລັງມາ. ຕອນນີ້ມີ ${last} ແບບທີ່ເຫຼືອຈາກລ໋ອດກ່ອນ.`;
+  const chip = (k, label, n) => `<button type="button" class="chip" data-act="filter" data-v="${k}" aria-pressed="${filter === k}">${label}<span class="n">${n}</span></button>`;
+  return demoBar('shop') + header() + `
+  <section class="hero" id="hero">
+    <div class="hero-bg" aria-hidden="true">${cols}</div>
+    <div class="hero-shade" aria-hidden="true"></div>
+    ${RING}
+    <div class="wrap hero-in">
+      <p class="eyebrow">${esc(d.month)} · ຈຳນວນຈຳກັດ</p>
+      <h1 class="drop"><span>DROP</span><span class="numwrap"><span class="num">${esc(d.id)}</span>${STAR}</span></h1>
+      <p class="lede">${lede}</p>
+      <div><button type="button" class="btn chrome shine" data-act="toGrid">SHOP NOW</button></div>
+    </div>
+  </section>
+  ${ticker(['PHONG-SHOP', 'DROP ' + d.id, 'LIMITED', 'ໝົດແລ້ວໝົດເລີຍ', 'STREET · GOTHIC · Y2K', 'ສົ່ງທົ່ວລາວ'])}
+  <div class="chips" id="grid"><div class="wrap" role="toolbar" aria-label="ໝວດສິນຄ້າ">${chip('all', 'ALL', list.length)}${cats.map(k => chip(k, CAT[k], list.filter(p => p.cat === k).length)).join('')}</div></div>
+  <div class="wrap">${shown.length ? `<div class="grid">${shown.map(card).join('')}</div>` : '<div class="empty"><p>ລ໋ອດນີ້ຍັງບໍ່ມີສິນຄ້າ</p></div>'}</div>
+  ${ticker(['NEW DROP', 'LIMITED PIECES', 'SOLD OUT = GONE', 'PHONG-SHOP'], 'alt')}
+  <section class="how"><div class="wrap">
+    <h2 class="sec-h">ສັ່ງແນວໃດ</h2>
+    <ol>
+      <li><div><b>ເລືອກ ແລະ ໃສ່ກະຕ່າ</b><p>ເລືອກສີ ແລະ ໄຊ. ຕົວເລກ "ເຫຼືອ" ແມ່ນ stock ຈິງໃນຮ້ານ.</p></div></li>
+      <li><div><b>ໂອນເງິນ ແລະ ອັບບິນ</b><p>ສະແກນ QR ຂອງຮ້ານ ໂອນຍອດຄ່າເຄື່ອງ ແລ້ວອັບຮູບບິນພາຍໃນ 15 ນາທີ.</p></div></li>
+      <li><div><b>ຮັບເຄື່ອງທີ່ສາຂາຂົນສົ່ງ</b><p>ຮ້ານກວດບິນ ແລ້ວສົ່ງຜ່ານ Anousith, HAL ຫຼື Mixay. ຄ່າສົ່ງຈ່າຍປາຍທາງ.</p></div></li>
+    </ol>
+  </div></section>` + footer();
+}
+
+/* ---------- product ---------- */
+let pdp = { id: null, color: null, size: null };
+function vProduct(id) {
+  const p = P(id); if (!p) return notFound('ບໍ່ພົບສິນຄ້ານີ້');
+  if (pdp.id !== id) pdp = { id, color: p.colors[0].key, size: null };
+  const c = colorOf(p, pdp.color) || p.colors[0];
+  const t = totalStock(p), ct = colorTotal(c), sizes = Object.keys(c.stock);
+  if (pdp.size && !(c.stock[pdp.size] > 0)) pdp.size = null;
+  if (sizes.length === 1 && c.stock[sizes[0]] > 0) pdp.size = sizes[0];
+  const sold = t === 0;
+  const slides = c.imgs.map((im, i) => `<div class="slide"><img src="${src(im)}" alt="${esc(p.name)} ຮູບທີ່ ${i + 1}"${i === 0 ? ' class="cut"' : ' loading="lazy"'}></div>`).join('');
+  const dots = c.imgs.length > 1 ? `<div class="dots">${c.imgs.map((_, i) => `<i${i === 0 ? ' class="on"' : ''}></i>`).join('')}</div>` : '';
+  const badges = [];
+  if (sold) badges.push('<span class="badge sold">SOLD OUT</span>');
+  else if (isLast(p)) badges.push('<span class="badge last">LAST PIECES · ຈາກ ' + esc(dropOf(p.drop).name) + '</span>');
+  const colorsHtml = p.colors.length > 1 ? `<div class="opt"><span class="lbl">ສີ<b>${esc(c.label)}</b></span><div class="sws">${p.colors.map(x => `<button type="button" class="sw" data-act="color" data-v="${x.key}" aria-pressed="${x.key === c.key}" aria-label="${esc(x.label)}${colorTotal(x) ? '' : ' (ໝົດ)'}"><i style="background:${esc(x.hex)}"></i></button>`).join('')}</div></div>` : `<div class="opt"><span class="lbl">ສີ<b>${esc(c.label)}</b></span></div>`;
+  const sizeBtn = s => { const n = c.stock[s] || 0; const lab = n === 0 ? 'ໝົດ' : n <= 3 ? 'ເຫຼືອ ' + n : 'ມີ'; return `<button type="button" class="size${n > 0 && n <= 3 ? ' low' : ''}" data-act="size" data-v="${s}" aria-pressed="${pdp.size === s}"${n === 0 ? ' disabled' : ''}><b>${s === 'FREE' ? 'FREE SIZE' : s}</b><small>${lab}</small></button>`; };
+  const chart = p.chart ? `<details><summary>ຕາຕະລາງຂະໜາດ</summary><div class="tablewrap"><table class="chart"><thead><tr>${CHARTS[p.chart].head.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${CHARTS[p.chart].rows.map(r => `<tr>${r.map(x => `<td>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div><p>ວັດແບບວາງພື້ນ ອາດຕ່າງກັນ ±2 cm.</p></details>` : '';
+  const others = S.products.filter(x => x.id !== p.id && inShop(x) && totalStock(x) > 0).slice(0, 6);
+  let bar;
+  if (sold) bar = `<button type="button" class="btn block" data-act="notify">ແຈ້ງຂ້ອຍຮອບໜ້າ</button><p class="note">ສິນຄ້ານີ້ໝົດແລ້ວ. ກົດເພື່ອໃຫ້ຮ້ານແຈ້ງເມື່ອມີລ໋ອດໃໝ່.</p>`;
+  else if (ct === 0) bar = `<button type="button" class="btn block" disabled>ສີ ${esc(c.label)} ໝົດແລ້ວ</button>`;
+  else bar = `<button type="button" class="btn chrome shine block" data-act="add">ໃສ່ກະຕ່າ · ${kip(p.price)}</button>`;
+  return demoBar('shop') + header() + `<div class="pdp">
+    <div class="gal${sold ? ' sold' : ''}"><div class="track" id="gal" data-key="${p.id}-${c.key}">${slides}</div>${dots}<a class="back" href="#shop" aria-label="ກັບຄືນ">←</a></div>
+    <div class="info">
+      ${badges.length ? `<div class="bline">${badges.join('')}</div>` : ''}
+      <h1 class="pname">${esc(p.name)}</h1>
+      <p class="plao">${esc(p.lao)}</p>
+      <p class="pprice">${kip(p.price)}</p>
+      ${colorsHtml}
+      <div class="opt"><span class="lbl">ໄຊ${pdp.size ? `<b>${pdp.size === 'FREE' ? 'FREE SIZE' : pdp.size}</b>` : ''}</span><div class="sizes" id="sizes">${sizes.map(sizeBtn).join('')}</div></div>
+      <div>${chart}
+        <details><summary>ການສົ່ງ</summary><p>ສົ່ງຜ່ານ Anousith, HAL ຫຼື Mixay ໄປສາຂາທີ່ທ່ານເລືອກ ທົ່ວປະເທດ. ຍອດທີ່ໂອນແມ່ນຄ່າເຄື່ອງຢ່າງດຽວ. ຄ່າສົ່ງຈ່າຍປາຍທາງຕາມລາຄາບໍລິສັດຂົນສົ່ງ.</p></details>
+        <details><summary>ການປ່ຽນສິນຄ້າ</summary><p>ປ່ຽນໄຊໄດ້ພາຍໃນ 3 ມື້ຫຼັງໄດ້ຮັບ ຖ້າຍັງມີ stock ແລະ ປ້າຍຍັງຢູ່. ບໍ່ຄືນເງິນ ຍົກເວັ້ນຮ້ານສົ່ງຜິດ ຫຼື ສິນຄ້າເສຍຫາຍ.</p></details>
+      </div>
+      ${others.length ? `<h2 class="sec-h" style="font-size:24px">ສິນຄ້າອື່ນໃນລ໋ອດນີ້</h2><div class="hscroll">${others.map(card).join('')}</div>` : ''}
+    </div>
+    <div class="buybar"><div class="in">${bar}</div></div>
+  </div>`;
+}
+function addToCart() {
+  const p = P(pdp.id), c = colorOf(p, pdp.color);
+  if (!pdp.size) { toast('ເລືອກໄຊກ່ອນ'); const el = $('#sizes'); if (el) { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); } return; }
+  const avail = c.stock[pdp.size] || 0;
+  const line = S.cart.find(l => l.pid === p.id && l.color === c.key && l.size === pdp.size);
+  const q = (line ? line.qty : 0) + 1;
+  if (q > avail) { toast(`ໄຊນີ້ເຫຼືອພຽງ ${avail} ໂຕ ແລະ ຢູ່ໃນກະຕ່າແລ້ວ`); return; }
+  const gal = $('#gal'); let from = null, fromSrc = null;
+  if (gal) { const imgs = gal.querySelectorAll('img'); const im = imgs[Math.round(gal.scrollLeft / Math.max(1, gal.clientWidth))] || imgs[0]; if (im) { from = im.getBoundingClientRect(); fromSrc = im.currentSrc || im.src; } }
+  if (line) line.qty = q; else S.cart.push({ pid: p.id, color: c.key, size: pdp.size, qty: 1 });
+  save(); render(); flyToCart(from, fromSrc);
+  toast('ໃສ່ກະຕ່າແລ້ວ', { href: '#cart', label: 'ເບິ່ງກະຕ່າ' });
+}
+function flyToCart(r, url) {
+  const btn = $('.cartbtn'), count = btn && btn.querySelector('.count');
+  const bump = () => [[count, 'bump'], [btn, 'hit']].forEach(([el, cls]) => { if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); });
+  const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!btn || !r || !url || reduce || !Element.prototype.animate) { bump(); return; }
+  const w = Math.min(r.width, 220), h = w * 1.25;
+  const x0 = r.left + r.width / 2 - w / 2, y0 = Math.max(80, Math.min(innerHeight - h - 80, r.top + r.height / 2 - h / 2));
+  const fly = document.createElement('img'); fly.src = url; fly.className = 'fly'; fly.alt = '';
+  Object.assign(fly.style, { left: x0 + 'px', top: y0 + 'px', width: w + 'px', height: h + 'px' });
+  document.body.appendChild(fly);
+  const c = btn.getBoundingClientRect();
+  const dx = c.right - 18 - (x0 + w / 2), dy = c.top + c.height / 2 - (y0 + h / 2);
+  const anim = fly.animate([
+    { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1 },
+    { transform: `translate(${dx * 0.3}px,${dy * 0.2 - 50}px) scale(.72) rotate(-6deg)`, opacity: 1, offset: 0.35 },
+    { transform: `translate(${dx}px,${dy}px) scale(.08) rotate(-18deg)`, opacity: 0.35 }
+  ], { duration: 850, easing: 'cubic-bezier(.55,0,.6,1)' });
+  anim.onfinish = () => { fly.remove(); bump(); };
+}
+
+/* ---------- cart ---------- */
+function cartProblems() {
+  return S.cart.map(l => { const c = colorOf(P(l.pid), l.color); const a = c ? (c.stock[l.size] || 0) : 0; return a === 0 ? 'gone' : l.qty > a ? 'over' : ''; });
+}
+function vCart() {
+  if (!S.cart.length) return demoBar('shop') + header() + `<div class="wrap"><div class="page"><h1 class="page-h">ກະຕ່າ</h1><div class="empty"><p>ກະຕ່າຍັງຫວ່າງຢູ່</p><a class="btn chrome" href="#shop">ເລືອກສິນຄ້າ</a></div></div></div>`;
+  const probs = cartProblems();
+  const lines = S.cart.map((l, i) => {
+    const p = P(l.pid), c = colorOf(p, l.color), a = c ? (c.stock[l.size] || 0) : 0;
+    const warn = probs[i] === 'gone' ? '<p class="warn">ໄຊນີ້ຫາກໍໝົດ. ກະລຸນາລຶບອອກ.</p>' : probs[i] === 'over' ? `<p class="warn">ເຫຼືອພຽງ ${a} ໂຕ. ກະລຸນາຫຼຸດຈຳນວນ.</p>` : '';
+    return `<div class="line"><a class="ph" href="#product-${p.id}"><img src="${src(c.imgs[0])}" alt=""></a><div>
+      <h3>${esc(p.name)}</h3><p class="sub">${esc(c.label)} · ${l.size === 'FREE' ? 'FREE SIZE' : 'ໄຊ ' + l.size}</p>${warn}
+      <div class="row"><div class="step"><button type="button" data-act="qty" data-i="${i}" data-d="-1" aria-label="ຫຼຸດ"${l.qty <= 1 ? ' disabled' : ''}>−</button><span>${l.qty}</span><button type="button" data-act="qty" data-i="${i}" data-d="1" aria-label="ເພີ່ມ"${l.qty >= a ? ' disabled' : ''}>+</button></div>
+      <b>${kip(p.price * l.qty)}</b></div>
+      <button type="button" class="link" data-act="rm" data-i="${i}">ລຶບອອກ</button></div></div>`;
+  }).join('');
+  const sub = S.cart.reduce((a, l) => a + P(l.pid).price * l.qty, 0);
+  const blocked = probs.some(Boolean);
+  return demoBar('shop') + header() + `<div class="wrap"><div class="page">
+    <h1 class="page-h">ກະຕ່າ</h1>
+    <div>${lines}</div>
+    <div class="sum"><div class="r"><span>ຄ່າເຄື່ອງ (${cartCount()} ຊິ້ນ)</span><span>${kip(sub)}</span></div><div class="r"><span>ຄ່າສົ່ງ</span><span class="mini">ຈ່າຍປາຍທາງ</span></div><div class="r total"><span>ຍອດທີ່ຕ້ອງໂອນ</span><span>${kip(sub)}</span></div></div>
+    <a class="btn chrome block" href="#checkout"${blocked ? ' aria-disabled="true" data-act="blocked"' : ''}>ໄປໜ້າສົ່ງເຄື່ອງ ແລະ ຈ່າຍເງິນ</a>
+    <p class="note">ສິນຄ້າຖືກຈອງໃຫ້ທ່ານ 15 ນາທີ ນັບແຕ່ກົດຢືນຢັນໃນໜ້າຕໍ່ໄປ.</p>
+  </div></div>`;
+}
+
+/* ---------- checkout ---------- */
+let ck = null, ckErr = {};
+function vCheckout() {
+  if (!ck) ck = Object.assign({ name: '', phone: '', courier: '', courierOther: '', province: '', branch: '', note: '', agree: false }, S.customer || {}, { agree: false });
+  const sub = S.cart.reduce((a, l) => a + P(l.pid).price * l.qty, 0);
+  const f = (id, label, inner, hint) => `<div class="field${ckErr[id] ? ' err' : ''}"><label for="ck-${id}">${label}</label>${inner}${hint ? `<span class="hint">${hint}</span>` : ''}${ckErr[id] ? `<span class="msg">${ckErr[id]}</span>` : ''}</div>`;
+  const items = S.cart.map(l => `<div class="r"><span>${esc(itemName({ pid: l.pid, color: l.color, size: l.size }))} × ${l.qty}</span><span>${kip(P(l.pid).price * l.qty)}</span></div>`).join('');
+  return demoBar('shop') + header() + `<div class="wrap"><div class="page">
+    <h1 class="page-h">ສົ່ງເຄື່ອງ</h1>
+    <form id="ckform" novalidate>
+      <div class="row2">
+        ${f('name', 'ຊື່ຜູ້ຮັບ', `<input id="ck-name" name="name" autocomplete="name" value="${esc(ck.name)}">`)}
+        ${f('phone', 'ເບີໂທ', `<input id="ck-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="020 xxxx xxxx" value="${esc(ck.phone)}">`, 'ບໍລິສັດຂົນສົ່ງຈະໂທຫາເບີນີ້ເມື່ອເຄື່ອງຮອດ')}
+      </div>
+      <div class="field${ckErr.courier ? ' err' : ''}"><span class="flbl" id="ck-courier-l">ບໍລິສັດຂົນສົ່ງ</span>
+        <div class="radios" role="group" aria-labelledby="ck-courier-l">${COURIERS.map(x => `<button type="button" class="chip" data-act="courier" data-v="${x}" aria-pressed="${ck.courier === x}">${x}</button>`).join('')}</div>
+        ${ck.courier === 'ອື່ນໆ' ? `<input id="ck-courierOther" name="courierOther" placeholder="ຊື່ບໍລິສັດຂົນສົ່ງ" value="${esc(ck.courierOther)}" aria-label="ຊື່ບໍລິສັດຂົນສົ່ງ">` : ''}
+        ${ckErr.courier ? `<span class="msg">${ckErr.courier}</span>` : ''}</div>
+      ${f('province', 'ແຂວງປາຍທາງ', `<select id="ck-province" name="province"><option value="">ເລືອກແຂວງ</option>${PROVINCES.map(x => `<option${ck.province === x ? ' selected' : ''}>${x}</option>`).join('')}</select>`)}
+      ${f('branch', 'ເມືອງ ແລະ ສາຂາຂົນສົ່ງ', `<input id="ck-branch" name="branch" placeholder="ຕົວຢ່າງ: ເມືອງໄຊເສດຖາ · ສາຂາໂພນຕ້ອງ" value="${esc(ck.branch)}">`, 'ສາຂາທີ່ທ່ານຈະໄປຮັບເຄື່ອງ')}
+      ${f('note', 'ໝາຍເຫດ (ບໍ່ບັງຄັບ)', `<textarea id="ck-note" name="note">${esc(ck.note)}</textarea>`)}
+      <div class="sum">${items}<div class="r"><span>ຄ່າສົ່ງ</span><span class="mini">ຈ່າຍປາຍທາງ ຕາມລາຄາບໍລິສັດຂົນສົ່ງ</span></div><div class="r total"><span>ຍອດທີ່ຕ້ອງໂອນ</span><span>${kip(sub)}</span></div></div>
+      <label class="check"><input type="checkbox" id="ck-agree" name="agree"${ck.agree ? ' checked' : ''}><span>ຂ້ອຍອ່ານ <a href="#policy">ນະໂຍບາຍການປ່ຽນສິນຄ້າ</a> ແລ້ວ: ປ່ຽນໄຊໄດ້ພາຍໃນ 3 ມື້, ບໍ່ຄືນເງິນ ຍົກເວັ້ນຮ້ານສົ່ງຜິດ.</span></label>
+      ${ckErr.agree ? `<p class="err-text">${ckErr.agree}</p>` : ''}
+      <button class="btn chrome shine block" type="submit">ຢືນຢັນ ແລະ ໄປໜ້າຈ່າຍເງິນ</button>
+    </form>
+  </div></div>`;
+}
+function readCk() {
+  const fm = $('#ckform'); if (!fm) return;
+  ['name', 'phone', 'courierOther', 'province', 'branch', 'note'].forEach(k => { const el = fm.elements[k]; if (el) ck[k] = el.value.trim(); });
+  ck.agree = fm.elements.agree.checked;
+}
+function submitCheckout() {
+  readCk(); ckErr = {};
+  if (!ck.name) ckErr.name = 'ໃສ່ຊື່ຜູ້ຮັບ';
+  if (ck.phone.replace(/\D/g, '').length < 8) ckErr.phone = 'ໃສ່ເບີໂທໃຫ້ຄົບ';
+  if (!ck.courier) ckErr.courier = 'ເລືອກບໍລິສັດຂົນສົ່ງ';
+  else if (ck.courier === 'ອື່ນໆ' && !ck.courierOther) ckErr.courier = 'ໃສ່ຊື່ບໍລິສັດຂົນສົ່ງ';
+  if (!ck.province) ckErr.province = 'ເລືອກແຂວງ';
+  if (!ck.branch) ckErr.branch = 'ໃສ່ເມືອງ ແລະ ສາຂາ';
+  if (!ck.agree) ckErr.agree = 'ກະລຸນາຢືນຢັນວ່າອ່ານນະໂຍບາຍແລ້ວ';
+  if (Object.keys(ckErr).length) { render(); const first = document.querySelector('.field.err input, .field.err select, .field.err button'); if (first) first.focus(); toast('ກວດຂໍ້ມູນທີ່ເປັນສີແດງ'); return; }
+  const items = S.cart.map(l => ({ pid: l.pid, color: l.color, size: l.size, qty: l.qty, price: P(l.pid).price }));
+  const bad = reserve(items);
+  if (bad) { save(); toast(itemName(bad) + ' ຫາກໍໝົດ ກະລຸນາກວດກະຕ່າ'); location.hash = '#cart'; return; }
+  const code = 'PS-' + String(S.nextCode++).padStart(4, '0');
+  const customer = { name: ck.name, phone: ck.phone, courier: ck.courier === 'ອື່ນໆ' ? ck.courierOther : ck.courier, province: ck.province, branch: ck.branch, note: ck.note };
+  S.orders.unshift({ code, createdAt: Date.now(), expiresAt: Date.now() + HOLD_MS, status: 'awaiting_payment', items, customer, slip: null, source: 'direct', drop: S.current, mine: true });
+  S.customer = { name: ck.name, phone: ck.phone, courier: ck.courier, courierOther: ck.courierOther, province: ck.province, branch: ck.branch };
+  S.cart = []; ck = null; ckErr = {}; save();
+  location.hash = '#pay-' + code;
+}
+
+/* ---------- pay ---------- */
+let slipData = null, slipFor = null;
+function pseudoQR(seedStr) {
+  const n = 25; let h = 2166136261;
+  for (const ch of seedStr) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  const rnd = () => { h ^= h << 13; h >>>= 0; h ^= h >>> 17; h ^= h << 5; h >>>= 0; return h / 4294967296; };
+  const inF = (x, y) => (x < 8 && y < 8) || (x >= n - 8 && y < 8) || (x < 8 && y >= n - 8);
+  let r = '';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { if (!inF(x, y) && rnd() < 0.5) r += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }
+  const fd = (x, y) => `<rect x="${x}" y="${y}" width="7" height="7"/><rect x="${x + 1}" y="${y + 1}" width="5" height="5" fill="#fff"/><rect x="${x + 2}" y="${y + 2}" width="3" height="3"/>`;
+  return `<svg viewBox="-2 -2 ${n + 4} ${n + 4}" role="img" aria-label="QR ຕົວຢ່າງ" shape-rendering="crispEdges"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><g fill="#111">${r}${fd(0, 0)}${fd(n - 7, 0)}${fd(0, n - 7)}</g></svg>`;
+}
+function vPay(code) {
+  const o = S.orders.find(x => x.code === code); if (!o) return notFound('ບໍ່ພົບອໍເດີນີ້');
+  if (slipFor !== code) { slipData = null; slipFor = code; }
+  const total = orderTotal(o), b = S.bank;
+  const qr = b.qr ? `<img src="${b.qr}" alt="QR ບັນຊີ ${esc(b.bank)} ຂອງຮ້ານ">` : pseudoQR(code) + '<small>QR ຕົວຢ່າງ · ເຈົ້າຂອງຮ້ານອັບ QR ແທ້ໄດ້ໃນ Admin → ຕັ້ງຄ່າ</small>';
+  return demoBar('shop') + header() + `<div class="wrap"><div class="page">
+    <p class="eyebrow">ອໍເດີ <span class="code">${code}</span></p>
+    <h1 class="page-h">ໂອນເງິນ</h1>
+    <div class="timer" id="timer"><span>ສິນຄ້າຈອງໄວ້ໃຫ້ອີກ</span><b id="cd">15:00</b></div>
+    <div><p class="amount">${kip(total)}</p><p class="note">ໂອນຍອດນີ້ໃຫ້ຄົບ. ຄ່າສົ່ງຈ່າຍປາຍທາງ.</p></div>
+    <div class="qrbox">${qr}</div>
+    <dl class="kv">
+      <div><dt>ທະນາຄານ</dt><dd>${esc(b.bank)}</dd></div>
+      <div><dt>ຊື່ບັນຊີ</dt><dd>${esc(b.name)}</dd></div>
+      <div><dt>ເລກບັນຊີ</dt><dd><span class="code">${esc(b.number)}</span><button type="button" class="copy" data-act="copy" data-v="${esc(b.number)}">ກັອບ</button></dd></div>
+      <div><dt>ໝາຍເຫດການໂອນ</dt><dd><span class="code">${code}</span><button type="button" class="copy" data-act="copy" data-v="${code}">ກັອບ</button></dd></div>
+    </dl>
+    <ol class="steps">
+      <li>ສະແກນ QR ຫຼື ກັອບເລກບັນຊີ ໄປໂອນໃນແອບທະນາຄານ</li>
+      <li>ໃສ່ຍອດ <b>${kip(total)}</b> ແລະ ພິມ <b class="code">${code}</b> ໃນຊ່ອງໝາຍເຫດ</li>
+      <li>ຖ່າຍໜ້າຈໍບິນ ແລ້ວອັບຂ້າງລຸ່ມນີ້</li>
+    </ol>
+    <label class="upload" for="slip">
+      <input type="file" id="slip" accept="image/*">
+      ${slipData ? `<img src="${slipData}" alt="ຮູບບິນທີ່ເລືອກ"><span>ແຕະເພື່ອປ່ຽນຮູບ</span>` : '<span class="big">＋</span><span>ແຕະເພື່ອເລືອກຮູບບິນໂອນ</span>'}
+    </label>
+    <button type="button" class="btn chrome block" data-act="sendslip"${slipData ? '' : ' disabled'}>ສົ່ງບິນໃຫ້ຮ້ານກວດ</button>
+    <button type="button" class="btn ghost block" data-act="cancelorder">ຍົກເລີກອໍເດີ</button>
+  </div></div>`;
+}
+function readImage(file, max, cb) {
+  if (!file || !file.type.startsWith('image/')) { toast('ກະລຸນາເລືອກໄຟລ໌ຮູບ'); return; }
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, max / Math.max(im.width, im.height));
+      const c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      cb(c.toDataURL('image/jpeg', 0.75));
+    };
+    im.onerror = () => toast('ເປີດຮູບນີ້ບໍ່ໄດ້');
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+
+/* ---------- tracking ---------- */
+function vTrack(code) {
+  if (!code) {
+    const mine = S.orders.filter(o => o.mine);
+    return demoBar('shop') + header() + `<div class="wrap"><div class="page">
+      <h1 class="page-h">ຕິດຕາມອໍເດີ</h1>
+      <form id="trackform"><div class="field"><label for="tr-code">ລະຫັດອໍເດີ</label><input id="tr-code" name="code" placeholder="PS-0124" autocapitalize="characters"></div><button class="btn chrome block" type="submit">ເບິ່ງສະຖານະ</button></form>
+      ${mine.length ? `<h2 class="grouph">ອໍເດີທີ່ສັ່ງຈາກເຄື່ອງນີ້</h2><div>${mine.map(o => `<a class="line" style="grid-template-columns:1fr auto;text-decoration:none" href="#track-${o.code}"><div><h3 class="code">${o.code}</h3><p class="sub">${dmy(o.createdAt)} · ${kip(orderTotal(o))}</p></div><span class="pill ${o.status}">${STATUS[o.status]}</span></a>`).join('')}</div>` : '<p class="note">ຕົວຢ່າງ: ລອງໃສ່ PS-0124 ຫຼື PS-0122</p>'}
+    </div></div>`;
+  }
+  const o = S.orders.find(x => x.code === code.toUpperCase()); if (!o) return notFound('ບໍ່ພົບອໍເດີ ' + code);
+  const flow = [['ສັ່ງແລ້ວ', o.createdAt], ['ຮ້ານໄດ້ຮັບບິນ ກຳລັງກວດ', o.slipAt], ['ກຳລັງກຽມເຄື່ອງ', o.confirmedAt], ['ສົ່ງແລ້ວ', o.shippedAt], ['ຮັບເຄື່ອງແລ້ວ', o.doneAt]];
+  const idx = { awaiting_payment: 0, pending_review: 1, preparing: 2, shipped: 3, done: 4 }[o.status];
+  const stopped = idx === undefined;
+  const tl = flow.map((f, i) => { const cls = stopped ? (f[1] ? 'done' : 'off') : i < idx ? 'done' : i === idx ? 'done now' : ''; return `<li class="${cls}"><div><b>${f[0]}</b>${f[1] ? `<small>${dmy(f[1])} ${hhmm(f[1])}</small>` : ''}</div></li>`; }).join('');
+  let banner = '';
+  if (o.status === 'awaiting_payment') banner = `<div class="banner warn"><b>ຍັງບໍ່ໄດ້ອັບບິນ</b><span>ໂອນເງິນ ແລະ ອັບບິນກ່ອນໝົດເວລາ.</span><a class="btn chrome sm" href="#pay-${o.code}" style="justify-self:start;margin-top:6px">ໄປໜ້າຈ່າຍເງິນ</a></div>`;
+  if (o.status === 'pending_review') banner = `<div class="banner"><b>ຮ້ານກຳລັງກວດບິນ</b><span class="muted">ໜ້ານີ້ອັບເດດເອງເມື່ອຮ້ານຢືນຢັນ. ບັນທຶກລິ້ງນີ້ໄວ້ເພື່ອກັບມາເບິ່ງ.</span></div>`;
+  if (o.status === 'shipped') banner = `<div class="banner ok"><b>ເຄື່ອງອອກຈາກຮ້ານແລ້ວ</b><span>${esc(o.customer.courier)} · ເລກພັດສະດຸ <span class="code">${esc(o.tracking)}</span></span><span>ຄ່າສົ່ງຈ່າຍທີ່ສາຂາ ${esc(o.customer.branch)}</span></div>`;
+  if (o.status === 'rejected') banner = `<div class="banner bad"><b>ຮ້ານປະຕິເສດບິນ</b><span>ເຫດຜົນ: ${esc(o.reason)}. ສິນຄ້າຖືກປ່ອຍຄືນແລ້ວ. ຖ້າໂອນແລ້ວແທ້ ຕິດຕໍ່ຮ້ານພ້ອມລະຫັດອໍເດີ.</span></div>`;
+  if (o.status === 'expired') banner = `<div class="banner bad"><b>ໝົດເວລາ 15 ນາທີ</b><span>ອໍເດີຖືກຍົກເລີກ ແລະ ສິນຄ້າຖືກປ່ອຍຄືນ. ສັ່ງໃໝ່ໄດ້ຖ້າຍັງມີ stock.</span></div>`;
+  if (o.status === 'cancelled') banner = `<div class="banner bad"><b>ອໍເດີຖືກຍົກເລີກ</b></div>`;
+  if (o.status === 'done') banner = `<div class="banner ok"><b>ສຳເລັດ ຂອບໃຈທີ່ອຸດໜູນ</b></div>`;
+  return demoBar('shop') + header() + `<div class="wrap"><div class="page">
+    <p class="eyebrow">ອໍເດີ</p><h1 class="page-h code" style="font-family:var(--f-display)">${o.code}</h1>
+    ${banner}
+    <ol class="tl">${tl}</ol>
+    <div class="sum">${o.items.map(it => `<div class="r"><span>${esc(itemName(it))} × ${it.qty}</span><span>${kip(it.price * it.qty)}</span></div>`).join('')}<div class="r total"><span>ຍອດໂອນ</span><span>${kip(orderTotal(o))}</span></div></div>
+    <dl class="kv"><div><dt>ຜູ້ຮັບ</dt><dd>${esc(o.customer.name)} · ${esc(o.customer.phone)}</dd></div><div><dt>ຂົນສົ່ງ</dt><dd>${esc(o.customer.courier)}</dd></div><div><dt>ປາຍທາງ</dt><dd>${esc(o.customer.province)} · ${esc(o.customer.branch)}</dd></div></dl>
+    <a class="btn" href="#shop">ກັບໜ້າຮ້ານ</a>
+  </div></div>`;
+}
+
+/* ---------- archive + policy ---------- */
+function vArchive() {
+  const drops = S.drops.filter(d => d.id !== S.current).reverse();
+  const body = drops.map(d => { const ps = S.products.filter(p => p.drop === d.id && inArchive(p)); return ps.length ? `<h2 class="grouph">${esc(d.name)} · ${esc(d.month)}</h2><div class="grid" style="padding-block:10px 0">${ps.map(card).join('')}</div>` : ''; }).join('');
+  return demoBar('shop') + header() + `<div class="wrap"><div class="page wide" style="gap:6px"><h1 class="page-h">ARCHIVE</h1><p class="note">ສິນຄ້າທີ່ຂາຍໝົດແລ້ວຈາກລ໋ອດກ່ອນໆ.</p>${body || '<div class="empty"><p>ຍັງບໍ່ມີສິນຄ້າໃນ archive</p></div>'}</div></div>` + footer();
+}
+function vPolicy() {
+  return demoBar('shop') + header() + `<div class="wrap"><div class="page">
+    <h1 class="page-h">ການສົ່ງ ແລະ ການປ່ຽນສິນຄ້າ</h1>
+    <div class="box"><h2>ການຈ່າຍເງິນ</h2><p class="muted" style="margin:0">ໂອນຍອດຄ່າເຄື່ອງເຂົ້າບັນຊີ BCEL ຂອງຮ້ານ ພ້ອມພິມລະຫັດອໍເດີໃນໝາຍເຫດ ແລ້ວອັບບິນພາຍໃນ 15 ນາທີ. ຮ້ານກວດວ່າເງິນເຂົ້າແທ້ກ່ອນຢືນຢັນ.</p></div>
+    <div class="box"><h2>ການສົ່ງ</h2><p class="muted" style="margin:0">ສົ່ງຜ່ານ Anousith, HAL ຫຼື Mixay ໄປສາຂາທີ່ທ່ານເລືອກ ທົ່ວປະເທດ. ບໍ່ມີສົ່ງເຖິງບ້ານ. ຄ່າສົ່ງລູກຄ້າຈ່າຍເອງທີ່ປາຍທາງ ຕາມລາຄາບໍລິສັດຂົນສົ່ງ.</p></div>
+    <div class="box"><h2>ການປ່ຽນສິນຄ້າ</h2><p class="muted" style="margin:0">ປ່ຽນໄຊໄດ້ພາຍໃນ 3 ມື້ຫຼັງໄດ້ຮັບເຄື່ອງ ຖ້າຍັງມີ stock ແລະ ປ້າຍຍັງຢູ່. ບໍ່ຄືນເງິນ ຍົກເວັ້ນຮ້ານສົ່ງຜິດ ຫຼື ສິນຄ້າເສຍຫາຍ.</p></div>
+  </div></div>` + footer();
+}
+
+/* ---------- admin ---------- */
+let af = 'pending_review', rejecting = null, zoom = null, addOpen = false, dropAsk = false, resetAsk = false, newImg = null, qrDraft = undefined;
+function adminChrome(tab, body) {
+  const tabs = [['orders', 'ອໍເດີ', pendingCount()], ['products', 'ສິນຄ້າ'], ['drops', 'ລ໋ອດ'], ['sales', 'ຍອດຂາຍ'], ['setup', 'ຕັ້ງຄ່າ']];
+  return demoBar('admin') + `<header class="top"><div class="wrap"><a class="brand" href="#admin">PHONG-SHOP<small>ADMIN</small></a><a class="navlink" href="#shop">ເບິ່ງໜ້າຮ້ານ →</a></div></header>
+  <div class="chips"><div class="wrap">${tabs.map(t => `<a class="chip" href="#admin-${t[0]}"${t[0] === tab ? ' aria-current="page"' : ''}>${t[1]}${t[2] ? ` <span class="n">${t[2]}</span>` : ''}</a>`).join('')}</div></div>
+  <div class="wrap"><div class="page wide">${body}</div></div>`;
+}
+function vAdmin(tab) {
+  tab = tab || 'orders';
+  const views = { orders: aOrders, products: aProducts, drops: aDrops, sales: aSales, setup: aSetup };
+  return adminChrome(tab, (views[tab] || aOrders)());
+}
+function tgCard(o) {
+  const wait = Date.now() - (o.slipAt || o.createdAt);
+  const text = `ອໍເດີໃໝ່ ${o.code}\nຍອດຕ້ອງໂອນ: ${kip(orderTotal(o))}\nລູກຄ້າ: ${o.customer.name} · ${o.customer.phone}\nສົ່ງ: ${o.customer.courier} → ${o.customer.province}, ${o.customer.branch}\n${o.items.map(it => '• ' + itemName(it) + ' × ' + it.qty).join('\n')}${wait > REMIND_MS ? `\n\nເຕືອນຊ້ຳ: ລໍຖ້າມາ ${Math.round(wait / 60e3)} ນາທີແລ້ວ` : ''}`;
+  return `<section class="tg" aria-label="ຕົວຢ່າງແຈ້ງເຕືອນ Telegram"><div class="who">PHONG-SHOP Bot · ຕົວຢ່າງຂໍ້ຄວາມທີ່ຈະເຂົ້າ Telegram</div>
+    <div class="msg">${o.slip ? `<img src="${o.slip}" alt="ບິນ ${o.code}">` : '<span></span>'}<pre>${esc(text)}</pre></div>
+    <div class="kb"><button type="button" data-act="a-confirm" data-code="${o.code}">ຢືນຢັນ</button><button type="button" data-act="a-reject" data-code="${o.code}">ປະຕິເສດ</button></div></section>`;
+}
+function orderCard(o) {
+  const total = orderTotal(o), wait = Date.now() - (o.slipAt || o.createdAt);
+  const late = o.status === 'pending_review' && wait > REMIND_MS;
+  let acts = '';
+  if (o.status === 'pending_review') {
+    acts = rejecting === o.code
+      ? `<div class="reasons"><span class="note">ເລືອກເຫດຜົນ (ລູກຄ້າຈະເຫັນໃນໜ້າຕິດຕາມ):</span><div class="acts">${REASONS.map(r => `<button type="button" class="btn sm danger" data-act="a-reason" data-code="${o.code}" data-v="${esc(r)}">${r}</button>`).join('')}</div><button type="button" class="link" data-act="a-reject-cancel">ບໍ່ປະຕິເສດ</button></div>`
+      : `<div class="acts"><button type="button" class="btn chrome sm" data-act="a-confirm" data-code="${o.code}">ຢືນຢັນ · ເງິນເຂົ້າແລ້ວ</button><button type="button" class="btn sm danger" data-act="a-reject" data-code="${o.code}">ປະຕິເສດ</button></div><p class="note" style="margin:0">ກວດໃນແອບທະນາຄານວ່າມີເງິນ ${kip(total)} ໝາຍເຫດ ${o.code} ເຂົ້າແທ້ ກ່ອນກົດຢືນຢັນ.</p>`;
+  } else if (o.status === 'preparing') {
+    acts = `<div class="acts"><input id="trk-${o.code}" placeholder="ເລກພັດສະດຸ ${esc(o.customer.courier)}" aria-label="ເລກພັດສະດຸ"><button type="button" class="btn chrome sm" data-act="a-ship" data-code="${o.code}">ໝາຍວ່າສົ່ງແລ້ວ</button></div>`;
+  } else if (o.status === 'shipped') {
+    acts = `<div class="acts"><span class="note">ເລກພັດສະດຸ <span class="code">${esc(o.tracking)}</span></span><button type="button" class="btn sm" data-act="a-done" data-code="${o.code}">ລູກຄ້າຮັບແລ້ວ</button></div>`;
+  } else if (o.status === 'awaiting_payment') {
+    acts = `<div class="acts"><span class="note">ລູກຄ້າຍັງບໍ່ໄດ້ອັບບິນ · ໝົດເວລາ ${hhmm(o.expiresAt)}</span><button type="button" class="btn sm danger" data-act="a-cancel" data-code="${o.code}">ຍົກເລີກ</button></div>`;
+  } else if (o.status === 'rejected') acts = `<p class="note" style="margin:0">ເຫດຜົນ: ${esc(o.reason)}</p>`;
+  return `<article class="ocard${late ? ' alert' : ''}">
+    <div class="ohead"><span class="code">${o.code}</span><span class="pill ${o.status}">${STATUS[o.status]}</span></div>
+    ${late ? `<p class="alertline">ລໍຖ້າກວດ ${Math.round(wait / 60e3)} ນາທີແລ້ວ · Telegram ເຕືອນຊ້ຳແລ້ວ</p>` : ''}
+    <div class="ogrid"><div>
+      <p><b>${esc(o.customer.name)}</b> · ${esc(o.customer.phone)}</p>
+      <p class="muted">${esc(o.customer.courier)} → ${esc(o.customer.province)}, ${esc(o.customer.branch)}</p>
+      ${o.customer.note ? `<p class="muted">ໝາຍເຫດ: ${esc(o.customer.note)}</p>` : ''}
+      <ul>${o.items.map(it => `<li>${esc(itemName(it))} × ${it.qty}</li>`).join('')}</ul>
+      <p style="margin-top:6px"><b>${kip(total)}</b> <span class="muted">· ${ago(o.createdAt)} · ${SOURCES[o.source] || o.source}${o.demo ? ' · ຕົວຢ່າງ' : ''}</span></p>
+    </div>${o.slip ? `<button type="button" class="slipbtn" data-act="a-zoom" data-code="${o.code}" aria-label="ເບິ່ງບິນ ${o.code}"><img class="slipthumb" src="${o.slip}" alt=""></button>` : ''}</div>
+    ${acts}
+    <a class="link" href="#track-${o.code}">ເບິ່ງໜ້າຕິດຕາມຂອງລູກຄ້າ</a>
+  </article>`;
+}
+function aOrders() {
+  const cnt = s => S.orders.filter(o => o.status === s).length;
+  const filters = [['pending_review', 'ລໍຖ້າກວດ'], ['preparing', 'ກຳລັງກຽມ'], ['shipped', 'ສົ່ງແລ້ວ'], ['awaiting_payment', 'ລໍຖ້າໂອນ'], ['all', 'ທັງໝົດ']];
+  const list = S.orders.filter(o => af === 'all' || o.status === af);
+  const tgO = S.orders.filter(o => o.status === 'pending_review').sort((a, b) => (a.slipAt || 0) - (b.slipAt || 0))[0];
+  return `<h1 class="page-h">ອໍເດີ</h1>
+    ${tgO ? tgCard(tgO) : '<div class="banner ok"><b>ບໍ່ມີບິນລໍຖ້າກວດ</b><span>ເມື່ອລູກຄ້າອັບບິນ ຂໍ້ຄວາມຈະເຂົ້າ Telegram ພ້ອມປຸ່ມຢືນຢັນ.</span></div>'}
+    <div class="radios">${filters.map(f => `<button type="button" class="chip" data-act="a-filter" data-v="${f[0]}" aria-pressed="${af === f[0]}">${f[1]} <span class="n">${f[0] === 'all' ? S.orders.length : cnt(f[0])}</span></button>`).join('')}</div>
+    ${list.length ? `<div class="olist">${list.map(orderCard).join('')}</div>` : '<div class="empty"><p>ບໍ່ມີອໍເດີໃນສະຖານະນີ້</p></div>'}`;
+}
+function prodStatus(p) {
+  if (inArchive(p)) return '<span class="pill">ARCHIVE</span>';
+  if (totalStock(p) === 0) return '<span class="pill rejected">SOLD OUT</span>';
+  if (isLast(p)) return '<span class="pill shipped">LAST PIECES</span>';
+  return '<span class="pill live">ກຳລັງຂາຍ</span>';
+}
+function prodRow(p) {
+  return `<div class="prow"><div class="ph"><img src="${src(p.colors[0].imgs[0])}" alt=""></div><div>
+    <h3>${esc(p.name)}</h3><p class="sub">${kip(p.price)} · ${CAT[p.cat]} · ${esc(dropOf(p.drop).name)} ${prodStatus(p)}</p>
+    <div class="stockgrid">${p.colors.map(c => `<div class="srow"><span class="clab">${esc(c.label)}</span>${Object.keys(c.stock).map(s => `<span class="scell"><span>${s === 'FREE' ? 'FREE' : s}</span><button type="button" data-act="st" data-pid="${p.id}" data-color="${c.key}" data-size="${s}" data-d="-1" aria-label="ຫຼຸດ ${esc(c.label)} ${s}">−</button><b class="${c.stock[s] ? '' : 'z'}">${c.stock[s]}</b><button type="button" data-act="st" data-pid="${p.id}" data-color="${c.key}" data-size="${s}" data-d="1" aria-label="ເພີ່ມ ${esc(c.label)} ${s}">+</button></span>`).join('')}</div>`).join('')}</div>
+  </div></div>`;
+}
+function aProducts() {
+  const cur = S.products.filter(p => p.drop === S.current), last = S.products.filter(isLast), arch = S.products.filter(inArchive);
+  const form = addOpen ? `<form id="addform" class="box" novalidate><h2>ເພີ່ມສິນຄ້າໃສ່ ${esc(dropOf(S.current).name)}</h2>
+      <div class="field"><label for="np-name">ຊື່ສິນຄ້າ (ອັງກິດ)</label><input id="np-name" name="name" placeholder="Washed Logo Hoodie"></div>
+      <div class="field"><label for="np-lao">ຄຳອະທິບາຍ (ລາວ)</label><input id="np-lao" name="lao"></div>
+      <div class="row2"><div class="field"><label for="np-cat">ໝວດ</label><select id="np-cat" name="cat"><option value="tops">TOPS</option><option value="bottoms">BOTTOMS</option><option value="acc">ACC</option></select></div>
+      <div class="field"><label for="np-price">ລາຄາ (₭)</label><input id="np-price" name="price" inputmode="numeric" placeholder="189000"></div></div>
+      <div class="field"><span class="flbl">Stock ແຕ່ລະໄຊ</span><div class="acts">${['M', 'L', 'XL', 'FREE'].map(s => `<label class="scell" style="padding:4px 8px"><span>${s}</span><input name="s-${s}" inputmode="numeric" placeholder="0" style="width:52px;min-height:32px;background:var(--ink);border:1px solid var(--line);border-radius:3px;color:var(--paper);padding:2px 6px" aria-label="Stock ${s}"></label>`).join('')}</div><span class="hint">ເຄື່ອງປະດັບໃສ່ແຕ່ FREE</span></div>
+      <label class="upload" for="np-img" style="min-height:110px"><input type="file" id="np-img" accept="image/*">${newImg ? `<img src="${newImg}" alt="ຮູບສິນຄ້າ" style="max-height:160px">` : '<span class="big">＋</span><span>ຮູບສິນຄ້າ (ພື້ນຂາວ)</span>'}</label>
+      <div class="acts"><button class="btn chrome sm" type="submit">ບັນທຶກສິນຄ້າ</button><button type="button" class="btn sm ghost" data-act="a-add-toggle">ຍົກເລີກ</button></div></form>`
+    : `<button type="button" class="btn chrome" data-act="a-add-toggle" style="justify-self:start">+ ເພີ່ມສິນຄ້າໃສ່ ${esc(dropOf(S.current).name)}</button>`;
+  return `<h1 class="page-h">ສິນຄ້າ</h1><p class="note" style="margin:0">ກົດ + / − ເມື່ອນັບ stock ໃໝ່. ໜ້າຮ້ານອັບເດດທັນທີ.</p>${form}
+    <h2 class="grouph">${esc(dropOf(S.current).name)} · ລ໋ອດປັດຈຸບັນ</h2><div>${cur.map(prodRow).join('') || '<p class="note">ຍັງບໍ່ມີສິນຄ້າ</p>'}</div>
+    ${last.length ? `<h2 class="grouph">LAST PIECES · ເຫຼືອຈາກລ໋ອດກ່ອນ</h2><div>${last.map(prodRow).join('')}</div>` : ''}
+    ${arch.length ? `<h2 class="grouph">ARCHIVE</h2><div>${arch.map(prodRow).join('')}</div>` : ''}`;
+}
+function aDrops() {
+  const nextId = String(Number(S.current) + 1).padStart(2, '0');
+  const carry = S.products.filter(p => totalStock(p) > 0).length;
+  const toArch = S.products.filter(p => p.drop === S.current && totalStock(p) === 0).length;
+  const rows = S.drops.slice().reverse().map(d => {
+    const n = S.products.filter(p => p.drop === d.id).length;
+    const paid = S.orders.filter(o => o.drop === d.id && PAID.includes(o.status));
+    const rev = paid.reduce((a, o) => a + orderTotal(o), 0);
+    return `<div class="box"><div class="dropc"><span class="nm">${esc(d.name)}</span>${d.id === S.current ? '<span class="pill live">ກຳລັງຂາຍ</span>' : '<span class="pill">ປິດແລ້ວ</span>'}</div><p class="note" style="margin:0">${esc(d.month)} · ${n} ແບບ · ${paid.length} ອໍເດີ · ${kip(rev)}</p></div>`;
+  }).join('');
+  const ask = dropAsk
+    ? `<div class="box" style="border-color:var(--chrome)"><h2>ເປີດ DROP ${nextId}?</h2><ul class="muted" style="margin:0;padding-left:18px"><li>${carry} ແບບທີ່ຍັງມີ stock ຈະຂາຍຕໍ່ເປັນ LAST PIECES</li><li>${toArch} ແບບທີ່ຂາຍໝົດໃນ ${esc(dropOf(S.current).name)} ຈະຍ້າຍໄປ ARCHIVE</li><li>ຈາກນັ້ນເພີ່ມສິນຄ້າໃໝ່ໃນແຖບ "ສິນຄ້າ"</li></ul><div class="acts"><button type="button" class="btn chrome sm" data-act="drop-go">ເປີດ DROP ${nextId}</button><button type="button" class="btn sm ghost" data-act="drop-no">ຍັງກ່ອນ</button></div></div>`
+    : `<button type="button" class="btn chrome" data-act="drop-ask" style="justify-self:start">ເປີດລ໋ອດໃໝ່ (DROP ${nextId})</button>`;
+  return `<h1 class="page-h">ລ໋ອດ</h1>${ask}${rows}`;
+}
+function aSales() {
+  const paid = S.orders.filter(o => PAID.includes(o.status));
+  const today = new Date().toDateString();
+  const tPaid = paid.filter(o => new Date(o.confirmedAt || o.createdAt).toDateString() === today);
+  const sum = a => a.reduce((x, o) => x + orderTotal(o), 0);
+  const pend = S.orders.filter(o => o.status === 'pending_review');
+  const bySrc = Object.keys(SOURCES).map(k => [SOURCES[k], sum(paid.filter(o => o.source === k))]);
+  const maxS = Math.max(1, ...bySrc.map(x => x[1]));
+  const units = {}; paid.forEach(o => o.items.forEach(it => { units[it.pid] = (units[it.pid] || 0) + it.qty; }));
+  const top = Object.entries(units).sort((a, b) => b[1] - a[1]).slice(0, 5); const maxU = Math.max(1, ...top.map(x => x[1]));
+  return `<h1 class="page-h">ຍອດຂາຍ</h1>
+    <div class="stats">
+      <div class="stat"><small>ມື້ນີ້ (${tPaid.length} ອໍເດີ)</small><b>${kip(sum(tPaid))}</b></div>
+      <div class="stat"><small>${esc(dropOf(S.current).name)} ທັງໝົດ</small><b>${kip(sum(paid.filter(o => o.drop === S.current)))}</b></div>
+      <div class="stat"><small>ລໍຖ້າກວດບິນ (${pend.length})</small><b>${kip(sum(pend))}</b></div>
+    </div>
+    <div class="box"><h2>ລູກຄ້າມາຈາກໃສ</h2><div class="bars">${bySrc.map(([l, v]) => `<div class="bar"><span>${l}</span><div class="tr"><div class="fill" style="width:${(v / maxS * 100).toFixed(1)}%"></div></div><span>${kip(v)}</span></div>`).join('')}</div><p class="note" style="margin:0">ນັບຈາກລິ້ງທີ່ຕິດລະຫັດ TikTok / Facebook. ລວມອໍເດີຕົວຢ່າງ.</p></div>
+    <div class="box"><h2>ຂາຍດີ (ຊິ້ນ)</h2><div class="bars">${top.map(([pid, n]) => `<div class="bar"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(P(pid) ? P(pid).name : pid)}</span><div class="tr"><div class="fill" style="width:${(n / maxU * 100).toFixed(1)}%"></div></div><span>${n}</span></div>`).join('') || '<p class="note">ຍັງບໍ່ມີ</p>'}</div></div>`;
+}
+function aSetup() {
+  const b = S.bank, qr = qrDraft !== undefined ? qrDraft : b.qr;
+  return `<h1 class="page-h">ຕັ້ງຄ່າ</h1>
+    <form id="bankform" class="box" novalidate><h2>ບັນຊີຮັບເງິນ</h2>
+      <div class="row2"><div class="field"><label for="bk-bank">ທະນາຄານ</label><input id="bk-bank" name="bank" value="${esc(b.bank)}"></div><div class="field"><label for="bk-name">ຊື່ບັນຊີ</label><input id="bk-name" name="name" value="${esc(b.name)}"></div></div>
+      <div class="field"><label for="bk-num">ເລກບັນຊີ</label><input id="bk-num" name="number" value="${esc(b.number)}"></div>
+      <div class="field"><span class="flbl">QR ຮັບເງິນ</span><div class="acts">${qr ? `<img class="qrprev" src="${qr}" alt="QR ປັດຈຸບັນ">` : '<span class="note">ຍັງໃຊ້ QR ຕົວຢ່າງ</span>'}<label class="btn sm" for="qrfile" style="position:relative">ອັບຮູບ QR<input type="file" id="qrfile" accept="image/*" style="position:absolute;opacity:0;width:1px;height:1px"></label></div><span class="hint">ຖ່າຍໜ້າຈໍ QR ຮັບເງິນຈາກແອບທະນາຄານ</span></div>
+      <button class="btn chrome sm" type="submit" style="justify-self:start">ບັນທຶກ</button></form>
+    <div class="box"><h2>Telegram</h2><p class="muted" style="margin:0">ເຊື່ອມ bot ກັບ Telegram ຂອງຮ້ານໃນໄລຍະ 2 (ລະບົບແທ້). ຕົ້ນແບບນີ້ສະແດງຕົວຢ່າງຂໍ້ຄວາມໃນແຖບອໍເດີ.</p></div>
+    <div class="box"><h2>ຂໍ້ມູນຕົ້ນແບບ</h2><p class="muted" style="margin:0">ອໍເດີ, stock ແລະ ກະຕ່າ ບັນທຶກໄວ້ໃນ browser ນີ້ເທົ່ານັ້ນ.</p>
+      ${resetAsk ? `<div class="acts"><button type="button" class="btn sm danger" data-act="reset-go">ລ້າງ ແລະ ເລີ່ມໃໝ່</button><button type="button" class="btn sm ghost" data-act="reset-no">ບໍ່ລ້າງ</button></div>` : `<button type="button" class="btn sm" data-act="reset-ask" style="justify-self:start">ກັບໄປຂໍ້ມູນຕົວຢ່າງເລີ່ມຕົ້ນ</button>`}</div>`;
+}
+
+/* ---------- router ---------- */
+let lastHash = null;
+function parse() {
+  const h = decodeURIComponent((location.hash || '').slice(1)) || 'shop';
+  const i = h.indexOf('-');
+  return i < 0 ? [h, ''] : [h.slice(0, i), h.slice(i + 1)];
+}
+function route() {
+  sweep();
+  const [v, a] = parse();
+  if (v === 'pay') { const o = S.orders.find(x => x.code === a); if (o && o.status !== 'awaiting_payment') { location.replace('#track-' + a); return; } }
+  if (v === 'checkout' && !S.cart.length) { location.replace('#cart'); return; }
+  if (v !== 'admin') { rejecting = null; dropAsk = false; resetAsk = false; }
+  render();
+  if (location.hash !== lastHash) { window.scrollTo(0, 0); lastHash = location.hash; }
+}
+function render() {
+  const [v, a] = parse();
+  const views = { shop: vShop, product: () => vProduct(a), cart: vCart, checkout: vCheckout, pay: () => vPay(a), track: () => vTrack(a), archive: vArchive, policy: vPolicy, admin: () => vAdmin(a) };
+  const g0 = $('#gal'), keepKey = g0 && g0.dataset.key, keepX = g0 ? g0.scrollLeft : 0;
+  $('#app').innerHTML = (views[v] || vShop)() + (zoom ? `<div class="overlay" data-act="zoom-close" role="dialog" aria-label="ຮູບບິນ"><img src="${zoom}" alt="ຮູບບິນ"></div>` : '');
+  const g1 = $('#gal'); if (g1 && keepKey && g1.dataset.key === keepKey && keepX) g1.scrollLeft = keepX;
+  after(v);
+}
+function showSplash() {
+  if ($('#splash')) return;
+  const letters = [...'PHONG-SHOP'].map((ch, i) => `<span style="--i:${i}">${ch}</span>`).join('');
+  const dust = Array.from({ length: 18 }, () => { const s = (Math.random() * 2.2 + 1).toFixed(1); return `<i style="left:${(Math.random() * 100).toFixed(1)}%;width:${s}px;height:${s}px;--dx:${Math.round(Math.random() * 60 - 30)}px;animation-duration:${(Math.random() * 8 + 7).toFixed(1)}s;animation-delay:-${(Math.random() * 12).toFixed(1)}s"></i>`; }).join('');
+  const el = document.createElement('div');
+  el.id = 'splash'; el.className = 'splash';
+  el.setAttribute('role', 'dialog'); el.setAttribute('aria-modal', 'true'); el.setAttribute('aria-label', 'PHONG-SHOP');
+  el.innerHTML = `<div class="sp-bg" style="background-image:url(${IMG}intro.jpg)"></div>
+    <div class="sp-stage">
+      <div class="sp-artwrap"><img class="sp-art" src="${IMG}intro.jpg" alt="Hoodie ສີດຳ · PHONG-SHOP new collection 2026"></div>
+      <div class="sp-glow"></div><div class="sp-sweep"></div>
+      <div class="sp-smoke"><i></i><i></i><i></i></div>
+      <div class="sp-dust">${dust}</div>
+      <div class="sp-flash"></div>
+      <div class="sp-top"><small>PHONG-SHOP<br>NEW COLLECTION 2026</small><p class="sp-brand" aria-hidden="true">${letters}</p></div>
+      <div></div>
+      <div class="sp-bottom"><button type="button" class="btn sp-go shine" data-act="enter">GET STARTED <span class="arr" aria-hidden="true">→</span></button><small>WEAR YOUR ATTITUDE</small></div>
+    </div>`;
+  document.body.appendChild(el); document.body.classList.add('has-splash');
+  setTimeout(() => { const b = el.querySelector('.sp-go'); if (b && !el.classList.contains('out')) b.focus({ preventScroll: true }); }, 2000);
+}
+function enterShop() {
+  const el = $('#splash'); if (!el || el.classList.contains('out')) return;
+  el.classList.add('out'); document.body.classList.remove('has-splash');
+  setTimeout(() => el.remove(), 800);
+}
+let heroIO = null;
+function after(v) {
+  document.body.classList.toggle('is-admin', v === 'admin');
+  if (heroIO) { heroIO.disconnect(); heroIO = null; }
+  const hero = $('#hero');
+  if (hero && 'IntersectionObserver' in window) { heroIO = new IntersectionObserver(([en]) => hero.classList.toggle('off', !en.isIntersecting)); heroIO.observe(hero); }
+  if (v === 'product') {
+    const tr = $('#gal'), dots = document.querySelectorAll('.gal .dots i');
+    if (tr && dots.length) {
+      const upd = () => { const i = Math.round(tr.scrollLeft / Math.max(1, tr.clientWidth)); dots.forEach((d, k) => d.classList.toggle('on', k === i)); };
+      tr.addEventListener('scroll', upd, { passive: true }); upd();
+    }
+  }
+  if (v === 'pay') updateTimer();
+}
+function updateTimer() {
+  const [v, a] = parse(); if (v !== 'pay') return;
+  const o = S.orders.find(x => x.code === a); const el = $('#cd'); if (!o || !el) return;
+  const left = o.expiresAt - Date.now();
+  if (left <= 0) { route(); return; }
+  const s = Math.ceil(left / 1000);
+  el.textContent = String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  $('#timer').classList.toggle('hurry', s <= 180);
+}
+let tickN = 0;
+setInterval(() => {
+  tickN++;
+  updateTimer();
+  if (tickN % 15 === 0) {
+    sweep();
+    const [v] = parse();
+    const typing = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+    if ((v === 'track' || v === 'admin') && !typing && !zoom) render();
+  }
+}, 1000);
+window.addEventListener('hashchange', route);
+window.addEventListener('storage', e => { if (e.key === KEY) { S = load(); render(); } });
+
+/* ---------- events ---------- */
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); toast('ກັອບແລ້ວ: ' + t); }
+  catch (e) { toast('ກັອບບໍ່ໄດ້ · ກົດຄ້າງທີ່ຕົວເລກເພື່ອກັອບເອງ'); }
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const act = el.dataset.act, code = el.dataset.code;
+  const o = code ? S.orders.find(x => x.code === code) : null;
+  switch (act) {
+    case 'enter': enterShop(); break;
+    case 'intro': showSplash(); break;
+    case 'toGrid': $('#grid').scrollIntoView({ behavior: 'smooth' }); break;
+    case 'filter': filter = el.dataset.v; render(); $('#grid').scrollIntoView(); break;
+    case 'color': pdp.color = el.dataset.v; pdp.size = null; render(); break;
+    case 'size': pdp.size = el.dataset.v; render(); break;
+    case 'add': addToCart(); break;
+    case 'notify': toast('ໃນເວັບແທ້ ປຸ່ມນີ້ເປີດ WhatsApp ຫາຮ້ານ ພ້ອມຊື່ສິນຄ້າ'); break;
+    case 'social': toast('ໃສ່ລິ້ງ ' + el.textContent + ' ຂອງຮ້ານພາຍຫຼັງ'); break;
+    case 'qty': { const l = S.cart[+el.dataset.i]; l.qty = Math.max(1, l.qty + +el.dataset.d); save(); render(); break; }
+    case 'rm': S.cart.splice(+el.dataset.i, 1); save(); render(); break;
+    case 'blocked': e.preventDefault(); toast('ແກ້ລາຍການທີ່ມີຄຳເຕືອນກ່ອນ'); break;
+    case 'courier': readCk(); ck.courier = el.dataset.v; delete ckErr.courier; render(); break;
+    case 'copy': copyText(el.dataset.v); break;
+    case 'sendslip': {
+      const [, a] = parse(); const ord = S.orders.find(x => x.code === a);
+      if (!ord || ord.status !== 'awaiting_payment' || !slipData) return;
+      ord.slip = slipData; ord.slipAt = Date.now(); ord.status = 'pending_review'; slipData = null; save();
+      location.hash = '#track-' + ord.code; toast('ສົ່ງບິນແລ້ວ · ຮ້ານຈະກວດ ແລະ ອັບເດດສະຖານະໃນໜ້ານີ້');
+      break;
+    }
+    case 'cancelorder': {
+      const [, a] = parse(); const ord = S.orders.find(x => x.code === a);
+      if (ord && ord.status === 'awaiting_payment') { ord.status = 'cancelled'; restock(ord); save(); location.hash = '#shop'; toast('ຍົກເລີກອໍເດີ ' + ord.code + ' ແລ້ວ'); }
+      break;
+    }
+    case 'a-filter': af = el.dataset.v; render(); break;
+    case 'a-confirm': if (o && o.status === 'pending_review') { o.status = 'preparing'; o.confirmedAt = Date.now(); rejecting = null; save(); render(); toast(o.code + ' ຢືນຢັນແລ້ວ · ລູກຄ້າເຫັນ "ກຳລັງກຽມເຄື່ອງ"'); } break;
+    case 'a-reject': rejecting = code; if (location.hash !== '#admin' && location.hash !== '#admin-orders') location.hash = '#admin-orders'; else render(); break;
+    case 'a-reject-cancel': rejecting = null; render(); break;
+    case 'a-reason': if (o && o.status === 'pending_review') { o.status = 'rejected'; o.reason = el.dataset.v; restock(o); rejecting = null; save(); render(); toast(o.code + ' ປະຕິເສດແລ້ວ · ຄືນ stock'); } break;
+    case 'a-ship': { const inp = $('#trk-' + code); const v = inp ? inp.value.trim() : ''; if (!v) { toast('ໃສ່ເລກພັດສະດຸກ່ອນ'); if (inp) inp.focus(); return; } o.status = 'shipped'; o.tracking = v; o.shippedAt = Date.now(); save(); render(); toast(o.code + ' ໝາຍວ່າສົ່ງແລ້ວ'); break; }
+    case 'a-done': o.status = 'done'; o.doneAt = Date.now(); save(); render(); break;
+    case 'a-cancel': if (o && o.status === 'awaiting_payment') { o.status = 'cancelled'; restock(o); save(); render(); toast(o.code + ' ຍົກເລີກແລ້ວ · ຄືນ stock'); } break;
+    case 'a-zoom': zoom = o && o.slip; render(); break;
+    case 'zoom-close': zoom = null; render(); break;
+    case 'st': { const c = colorOf(P(el.dataset.pid), el.dataset.color); const s = el.dataset.size; c.stock[s] = Math.max(0, (c.stock[s] || 0) + +el.dataset.d); save(); render(); break; }
+    case 'a-add-toggle': addOpen = !addOpen; newImg = null; render(); break;
+    case 'drop-ask': dropAsk = true; render(); break;
+    case 'drop-no': dropAsk = false; render(); break;
+    case 'drop-go': {
+      const next = String(Number(S.current) + 1).padStart(2, '0'); const m = new Date();
+      S.drops.push({ id: next, name: 'DROP ' + next, month: m.toLocaleString('en-US', { month: 'short' }).toUpperCase() + ' ' + m.getFullYear() });
+      S.current = next; dropAsk = false; filter = 'all'; save(); render(); toast('ເປີດ DROP ' + next + ' ແລ້ວ · ເພີ່ມສິນຄ້າໃໝ່ໃນແຖບສິນຄ້າ');
+      break;
+    }
+    case 'reset-ask': resetAsk = true; render(); break;
+    case 'reset-no': resetAsk = false; render(); break;
+    case 'reset-go': S = seed(); save(); resetAsk = false; filter = 'all'; pdp = { id: null }; ck = null; qrDraft = undefined; render(); toast('ກັບໄປຂໍ້ມູນຕົວຢ່າງແລ້ວ'); break;
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && zoom) { zoom = null; render(); } else if (e.key === 'Escape' && $('#splash')) enterShop(); });
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.id === 'slip') readImage(t.files[0], 900, d => { slipData = d; render(); });
+  if (t.id === 'np-img') { const fm = $('#addform'); const keep = fm ? Object.fromEntries(new FormData(fm)) : {}; readImage(t.files[0], 900, d => { newImg = d; render(); const f2 = $('#addform'); if (f2) Object.entries(keep).forEach(([k, v]) => { if (f2.elements[k] && typeof v === 'string') f2.elements[k].value = v; }); }); }
+  if (t.id === 'qrfile') readImage(t.files[0], 700, d => { qrDraft = d; render(); });
+});
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const fm = e.target;
+  if (fm.id === 'ckform') submitCheckout();
+  if (fm.id === 'trackform') { const c = fm.elements.code.value.trim().toUpperCase(); if (c) location.hash = '#track-' + (c.startsWith('PS-') ? c : 'PS-' + c.replace(/^PS/, '')); }
+  if (fm.id === 'bankform') { S.bank.bank = fm.elements.bank.value.trim() || 'BCEL'; S.bank.name = fm.elements.name.value.trim(); S.bank.number = fm.elements.number.value.trim(); if (qrDraft !== undefined) S.bank.qr = qrDraft; qrDraft = undefined; save(); render(); toast('ບັນທຶກບັນຊີແລ້ວ'); }
+  if (fm.id === 'addform') {
+    const g = k => (fm.elements[k] ? fm.elements[k].value.trim() : '');
+    const price = parseInt(g('price').replace(/\D/g, ''), 10);
+    const stock = {}; ['M', 'L', 'XL', 'FREE'].forEach(s => { const n = parseInt(g('s-' + s), 10); if (n > 0) stock[s] = n; });
+    if (!g('name') || !price || !Object.keys(stock).length || !newImg) { toast('ໃສ່ຊື່, ລາຄາ, stock ຢ່າງໜ້ອຍ 1 ໄຊ ແລະ ຮູບ'); return; }
+    S.products.unshift({ id: 'p' + Date.now().toString(36), name: g('name'), lao: g('lao'), cat: g('cat'), price, drop: S.current, chart: g('cat') === 'acc' ? null : (g('cat') === 'bottoms' ? 'pant' : 'top'),
+      colors: [{ key: 'default', label: 'ສີດຽວ', hex: '#888', imgs: [newImg], stock }] });
+    addOpen = false; newImg = null; save(); render(); toast('ເພີ່ມສິນຄ້າແລ້ວ · ເຫັນໃນໜ້າຮ້ານທັນທີ');
+  }
+});
+
+(function grain() {
+  try {
+    const c = document.createElement('canvas'); c.width = c.height = 128;
+    const g = c.getContext('2d'), d = g.createImageData(128, 128);
+    for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255 | 0; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+    g.putImageData(d, 0, 0);
+    const el = document.createElement('div'); el.className = 'grain'; el.setAttribute('aria-hidden', 'true');
+    el.style.backgroundImage = `url(${c.toDataURL()})`; document.body.appendChild(el);
+  } catch (e) {}
+})();
+if (parse()[0] === 'shop') showSplash();
+route();
+})();
+</script>
+
+</body>
+</html>
